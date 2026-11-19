@@ -1,0 +1,4 @@
+
+# Cache Python du lanceur racine
+__pycache__/
+*.pyc

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Losse Hub — GestiProj & Clair</title>
+<meta name="description" content="Point d'entrée unique vers GestiProj (gestion de projets) et Clair (analytique Google Sheets).">
+<style>
+:root{
+  --bg:#f4f6fb; --bg-grad1:#e8edff; --bg-grad2:#eefaf3;
+  --surface:#ffffff; --surface-2:#f8fafc; --border:#e2e8f0; --border-strong:#cbd5e1;
+  --text:#111c33; --muted:#67748b; --faint:#94a3b8;
+  --brand:#4f5bd5; --brand-2:#6d7bf0;
+  --green:#188038; --green-soft:#e6f4ea;
+  --violet:#6d4fbe; --violet-soft:#efeafc;
+  --shadow:0 1px 2px rgba(17,28,51,.05),0 12px 32px -12px rgba(17,28,51,.18);
+  --shadow-hover:0 2px 4px rgba(17,28,51,.06),0 24px 48px -16px rgba(17,28,51,.28);
+  --radius:18px;
+}
+html[data-theme="dark"]{
+  --bg:#0d1117; --bg-grad1:#141d33; --bg-grad2:#0f1f1a;
+  --surface:#161c26; --surface-2:#1b232f; --border:#293341; --border-strong:#3a4658;
+  --text:#e9eef7; --muted:#9aa8bd; --faint:#6b7890;
+  --brand:#8b95ff; --brand-2:#a3abff;
+  --green:#5fcd83; --green-soft:#16281d;
+  --violet:#b39cf5; --violet-soft:#221a33;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 16px 40px -16px rgba(0,0,0,.6);
+  --shadow-hover:0 2px 6px rgba(0,0,0,.5),0 28px 56px -20px rgba(0,0,0,.75);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+  background-image:
+    radial-gradient(900px 520px at 8% -8%, var(--bg-grad1) 0%, transparent 62%),
+    radial-gradient(760px 460px at 96% 4%, var(--bg-grad2) 0%, transparent 58%);
+  background-repeat:no-repeat;
+}
+a{color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+/* ---------- Barre supérieure ---------- */
+header.top{display:flex;align-items:center;gap:14px;padding:26px 0 8px}
+.mark{
+  width:42px;height:42px;border-radius:12px;flex:none;
+  background:linear-gradient(140deg,var(--brand),var(--brand-2));
+  color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px;letter-spacing:-.5px;
+  box-shadow:0 8px 18px -8px rgba(79,91,213,.9);
+}
+.brand-name{font-weight:700;letter-spacing:-.02em;font-size:16px;line-height:1.2}
+.brand-name small{display:block;font-weight:500;font-size:11.5px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.top .spacer{flex:1}
+.icon-btn{
+  width:38px;height:38px;border-radius:10px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text);cursor:pointer;font-size:16px;
+  display:grid;place-items:center;transition:border-color .15s,background .15s,transform .15s;
+}
+.icon-btn:hover{border-color:var(--border-strong);transform:translateY(-1px)}
+.pill{
+  display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:600;
+  padding:7px 12px;border-radius:999px;border:1px solid var(--border);
+  background:var(--surface);color:var(--muted);white-space:nowrap;
+}
+.pill .dot{width:7px;height:7px;border-radius:50%;background:var(--faint)}
+.pill.ok{color:var(--green);border-color:color-mix(in srgb,var(--green) 35%,var(--border))}
+.pill.ok .dot{background:var(--green);box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 18%,transparent)}
+.pill.warn{color:#b45309;border-color:#f5c078}
+html[data-theme="dark"] .pill.warn{color:#fbbf24;border-color:#5a4520}
+.pill.warn .dot{background:#e08a00}
+
+/* ---------- Héros ---------- */
+.hero{padding:52px 0 34px;max-width:760px}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--brand);
+  background:color-mix(in srgb,var(--brand) 10%,transparent);
+  padding:7px 12px;border-radius:999px;margin-bottom:20px;
+}
+h1{
+  font-size:clamp(30px,4.4vw,46px);line-height:1.1;letter-spacing:-.035em;
+  margin:0 0 16px;font-weight:800;
+}
+h1 .grad{
+  background:linear-gradient(100deg,var(--brand),var(--violet) 55%,var(--green));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hero p{font-size:16.5px;color:var(--muted);margin:0;max-width:620px}
+
+/* ---------- Cartes applications ---------- */
+.apps{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:12px}
+.app{
+  position:relative;display:flex;flex-direction:column;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden;color:inherit;
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+}
+.app:hover,.app:focus-within{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:var(--border-strong)}
+/* Lien étiré : toute la carte ouvre l'application, le lien documentation reste cliquable. */
+.app .open::after{content:'';position:absolute;inset:0;z-index:1;border-radius:var(--radius)}
+.app .open:focus-visible{outline:none}
+.app:focus-within{box-shadow:var(--shadow-hover),0 0 0 3px color-mix(in srgb,var(--brand) 45%,transparent)}
+.app .strip{height:4px;background:linear-gradient(90deg,var(--tone),color-mix(in srgb,var(--tone) 45%,transparent))}
+.app.gesti{--tone:var(--green);--tone-soft:var(--green-soft)}
+.app.clair{--tone:var(--violet);--tone-soft:var(--violet-soft)}
+.app-body{padding:24px 24px 0;flex:1}
+.app-head{display:flex;align-items:center;gap:13px;margin-bottom:14px}
+.app-logo{
+  width:44px;height:44px;border-radius:13px;flex:none;display:grid;place-items:center;
+  background:var(--tone-soft);color:var(--tone);font-weight:800;font-size:19px;letter-spacing:-.5px;
+}
+.app h2{margin:0;font-size:19px;letter-spacing:-.02em;line-height:1.25}
+.app .tag{display:block;font-size:12px;color:var(--muted);font-weight:500;margin-top:2px}
+.app p.desc{color:var(--muted);font-size:14px;margin:0 0 16px;min-height:66px}
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 20px}
+.tags span{
+  font-size:11px;font-weight:600;color:var(--muted);
+  background:var(--surface-2);border:1px solid var(--border);
+  padding:5px 9px;border-radius:7px;
+}
+.app-foot{
+  display:flex;align-items:center;gap:10px;padding:16px 24px;
+  border-top:1px solid var(--border);background:var(--surface-2);
+}
+.open{
+  display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:14px;
+  color:#fff;background:var(--tone);padding:10px 16px;border-radius:10px;
+  text-decoration:none;transition:filter .15s;
+}
+html[data-theme="light"] .app.gesti .open{background:var(--green)}
+html[data-theme="light"] .app.clair .open{background:var(--violet)}
+html[data-theme="dark"] .open{color:#0d1117}
+.app:hover .open{filter:brightness(1.06)}
+.doc-link{
+  margin-left:auto;font-size:12.5px;font-weight:600;color:var(--muted);
+  text-decoration:none;border-bottom:1px dashed var(--border-strong);padding-bottom:1px;
+  position:relative;z-index:2;
+}
+.doc-link:hover{color:var(--text)}
+
+/* ---------- Détails / colonnes ---------- */
+.section{margin-top:44px}
+.section h3{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:0 0 16px;font-weight:700}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:20px 20px 18px;box-shadow:var(--shadow);
+}
+.card .num{
+  display:inline-grid;place-items:center;width:26px;height:26px;border-radius:8px;
+  font-size:12px;font-weight:800;background:color-mix(in srgb,var(--brand) 12%,transparent);
+  color:var(--brand);margin-bottom:12px;
+}
+.card b{display:block;font-size:14.5px;margin-bottom:6px;letter-spacing:-.01em}
+.card p{margin:0;font-size:13.5px;color:var(--muted)}
+.card code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;
+  background:var(--surface-2);border:1px solid var(--border);border-radius:6px;
+  padding:1px 6px;color:var(--text);white-space:nowrap;
+}
+
+/* ---------- Bloc lancement ---------- */
+.launch{
+  margin-top:22px;display:grid;grid-template-columns:1.05fr .95fr;gap:0;
+  border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;
+  background:var(--surface);box-shadow:var(--shadow);
+}
+.launch-txt{padding:26px 26px}
+.launch-txt h3{margin:0 0 10px;font-size:17px;letter-spacing:-.02em}
+.launch-txt p{margin:0 0 16px;color:var(--muted);font-size:14px}
+.cmds{display:flex;flex-direction:column;gap:9px}
+.cmd{
+  display:flex;align-items:center;gap:10px;background:var(--surface-2);
+  border:1px solid var(--border);border-radius:9px;padding:10px 12px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;
+  overflow-x:auto;
+}
+.cmd span.prompt{color:var(--faint);user-select:none}
+.cmd code{white-space:nowrap}
+.cmd button{
+  margin-left:auto;flex:none;border:1px solid var(--border);background:var(--surface);
+  color:var(--muted);border-radius:6px;font-size:11px;font-family:inherit;
+  padding:4px 8px;cursor:pointer;transition:color .15s,border-color .15s;
+}
+.cmd button:hover{color:var(--text);border-color:var(--border-strong)}
+.launch-side{
+  background:
+    radial-gradient(420px 260px at 90% 0%, color-mix(in srgb,var(--violet) 16%,transparent), transparent 70%),
+    var(--surface-2);
+  padding:26px;border-left:1px solid var(--border);
+}
+.launch-side h4{margin:0 0 12px;font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--faint)}
+.launch-side ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px}
+.launch-side li{display:flex;gap:10px;font-size:13.5px;color:var(--muted);line-height:1.5}
+.launch-side li b{color:var(--text);font-weight:650}
+.tick{color:var(--green);flex:none;font-weight:800}
+
+/* ---------- Bandeau d'alerte ---------- */
+.notice{
+  display:none;gap:12px;align-items:flex-start;margin-top:20px;
+  border:1px solid #f5c078;background:#fff8ec;color:#8a5300;
+  border-radius:12px;padding:14px 16px;font-size:13.5px;
+}
+html[data-theme="dark"] .notice{background:#2a2010;border-color:#5a4520;color:#fbbf24}
+.notice.show{display:flex}
+.notice b{display:block;margin-bottom:2px}
+
+footer{
+  display:flex;flex-wrap:wrap;gap:10px 24px;justify-content:space-between;align-items:center;
+  margin-top:46px;padding:22px 0 40px;border-top:1px solid var(--border);
+  font-size:12.5px;color:var(--faint);
+}
+footer .kbd-hint{display:flex;gap:8px;align-items:center}
+kbd{
+  font-family:inherit;font-size:11px;font-weight:700;border:1px solid var(--border-strong);
+  border-bottom-width:2px;border-radius:5px;padding:1px 6px;color:var(--muted);background:var(--surface);
+}
+
+@media (max-width:880px){
+  .apps{grid-template-columns:1fr}
+  .app p.desc{min-height:0}
+  .grid3{grid-template-columns:1fr}
+  .launch{grid-template-columns:1fr}
+  .launch-side{border-left:0;border-top:1px solid var(--border)}
+  .hero{padding:38px 0 26px}
+}
+@media (max-width:520px){
+  .wrap{padding:0 16px}
+  header.top{padding:18px 0 4px}
+  .brand-name small{display:none}
+  .app-body{padding:20px 18px 0}
+  .app-foot{padding:14px 18px;flex-wrap:wrap}
+  .doc-link{margin-left:0}
+}
+@media print{ body{background:#fff} .icon-btn,.cmds,.launch-side{display:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="mark" aria-hidden="true">L</div>
+    <div class="brand-name">Losse Hub<small>Deux applications, un point d'entrée</small></div>
+    <div class="spacer"></div>
+    <span class="pill" id="serveur" title="État du lanceur local">
+      <span class="dot"></span><span id="serveurTxt">Vérification…</span>
+    </span>
+    <button class="icon-btn" id="theme" title="Changer de thème" aria-label="Changer de thème">🌙</button>
+  </header>
+
+  <section class="hero">
+    <span class="eyebrow">Espace de travail local</span>
+    <h1>Pilotez vos projets.<br><span class="grad">Lisez vos données.</span></h1>
+    <p>
+      Deux outils indépendants réunis derrière une seule page : <b>GestiProj</b> pour suivre
+      l'avancement des projets, <b>Clair</b> pour analyser un Google Sheets. Choisissez une
+      application, elle s'ouvre dans le même onglet.
+    </p>
+  </section>
+
+  <div class="apps">
+
+    <article class="app gesti">
+      <div class="strip"></div>
+      <div class="app-body">
+        <div class="app-head">
+          <div class="app-logo" aria-hidden="true">G</div>
+          <div>
+            <h2>GestiProj</h2>
+            <span class="tag">Gestion de projets &amp; progression</span>
+          </div>
+        </div>
+        <p class="desc">
+          Un tableau type Google Sheets pour gérer nom, priorité, responsable, durée et étapes.
+          Progression et statut calculés automatiquement, chronologie façon Gantt, import/export CSV.
+        </p>
+        <div class="tags">
+          <span>100 % local</span><span>Hors ligne</span><span>localStorage</span><span>Sans installation</span>
+        </div>
+      </div>
+      <div class="app-foot">
+        <a class="open" href="GestiProj/index.html">Ouvrir GestiProj <span aria-hidden="true">→</span></a>
+        <a class="doc-link" href="GestiProj/README.md">Documentation</a>
+      </div>
+    </article>
+
+    <article class="app clair">
+      <div class="strip"></div>
+      <div class="app-body">
+        <div class="app-head">
+          <div class="app-logo" aria-hidden="true">c.</div>
+          <div>
+            <h2>Clair</h2>
+            <span class="tag">Sheets Analytics — lecture seule</span>
+          </div>
+        </div>
+        <p class="desc">
+          Connectez un Google Sheets par lien partagé ou OAuth, puis explorez KPI, graphiques,
+          tendances et projections. Exports CSV, PNG et PDF. Aucune écriture dans la feuille.
+        </p>
+        <div class="tags">
+          <span>Lecture seule</span><span>Lien partagé / OAuth</span><span>Nécessite le serveur</span><span>Démo intégrée</span>
+        </div>
+      </div>
+      <div class="app-foot">
+        <a class="open" href="google-sheets-dashboard/index.html">Ouvrir Clair <span aria-hidden="true">→</span></a>
+        <a class="doc-link" href="google-sheets-dashboard/README.md">Documentation</a>
+      </div>
+    </article>
+
+  </div>
+
+  <div class="notice" id="notice" role="status">
+    <span aria-hidden="true">⚠️</span>
+    <div>
+      <b>Clair a besoin du petit serveur fourni.</b>
+      Vous avez ouvert cette page directement en <code>file://</code>. GestiProj fonctionne tel quel ;
+      pour Clair, lancez <code>python3 launch.py</code> (ou <code>launch.bat</code> sous Windows)
+      puis ouvrez <code>http://localhost:8000</code>.
+    </div>
+  </div>
+
+  <section class="section">
+    <h3>Comment démarrer</h3>
+    <div class="grid3">
+      <div class="card">
+        <span class="num">1</span>
+        <b>Lanceur unique (recommandé)</b>
+        <p>À la racine du dépôt : <code>python3 launch.py</code>. Une seule adresse sert les deux applications, relais Google compris.</p>
+      </div>
+      <div class="card">
+        <span class="num">2</span>
+        <b>GestiProj seul</b>
+        <p>Double-cliquez <code>GestiProj/index.html</code>. Aucun serveur, aucune dépendance : tout fonctionne en local.</p>
+      </div>
+      <div class="card">
+        <span class="num">3</span>
+        <b>Clair seul</b>
+        <p>Dans son dossier : <code>python3 serve.py</code>. Obligatoire pour les modules ES6 et le mode lien partagé.</p>
+      </div>
+    </div>
+
+    <div class="launch">
+      <div class="launch-txt">
+        <h3>Démarrer depuis la racine du dépôt</h3>
+        <p>Python 3.9+ suffit — aucune dépendance à installer.</p>
+        <div class="cmds">
+          <div class="cmd"><span class="prompt">$</span><code>python3 launch.py</code><button type="button" data-copy="python3 launch.py">Copier</button></div>
+          <div class="cmd"><span class="prompt">$</span><code>python3 launch.py --port 8001</code><button type="button" data-copy="python3 launch.py --port 8001">Copier</button></div>
+          <div class="cmd"><span class="prompt">&gt;</span><code>launch.bat</code><button type="button" data-copy="launch.bat">Copier</button></div>
+        </div>
+      </div>
+      <aside class="launch-side">
+        <h4>Bon à savoir</h4>
+        <ul>
+          <li><span class="tick">✓</span><span><b>Une seule origine.</b> Le serveur racine expose <code>/api/public-sheet</code> pour le mode lien partagé.</span></li>
+          <li><span class="tick">✓</span><span><b>Données cloisonnées.</b> GestiProj stocke dans le navigateur, Clair ne conserve rien.</span></li>
+          <li><span class="tick">✓</span><span><b>Rien n'est écrasé.</b> Chaque application garde ses fichiers, son serveur et ses tests.</span></li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <footer>
+    <span>Losse Hub — lanceur local des deux applications du dépôt.</span>
+    <span class="kbd-hint">Raccourcis : <kbd>1</kbd> GestiProj <kbd>2</kbd> Clair <kbd>T</kbd> thème</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var root = document.documentElement;
+
+  /* ---------- Thème : mémorisé, sinon préférence système ---------- */
+  var stored = null;
+  try { stored = localStorage.getItem('hub-theme'); } catch (e) {}
+  var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = stored || (prefersDark ? 'dark' : 'light');
+  function applyTheme(){
+    root.setAttribute('data-theme', theme);
+    var btn = document.getElementById('theme');
+    btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    btn.setAttribute('aria-label', theme === 'dark' ? 'Passer au thème clair' : 'Passer au thème sombre');
+  }
+  function toggleTheme(){
+    theme = theme === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem('hub-theme', theme); } catch (e) {}
+    applyTheme();
+  }
+  document.getElementById('theme').addEventListener('click', toggleTheme);
+  applyTheme();
+
+  /* ---------- État du lanceur : page servie en http ou ouverte en file:// ---------- */
+  var notice = document.getElementById('notice');
+  var pill = document.getElementById('serveur');
+  var pillTxt = document.getElementById('serveurTxt');
+  var isHttp = location.protocol === 'http:' || location.protocol === 'https:';
+  if (!isHttp) {
+    notice.classList.add('show');
+    pill.className = 'pill warn';
+    pillTxt.textContent = 'Ouvert en local (file://)';
+  } else {
+    fetch('api/health', {cache: 'no-store'})
+      .then(function(r){ return r.ok ? r.json() : Promise.reject(); })
+      .then(function(){
+        pill.className = 'pill ok';
+        pillTxt.textContent = 'Lanceur actif';
+      })
+      .catch(function(){
+        pill.className = 'pill warn';
+        pillTxt.textContent = 'Relais Google indisponible';
+      });
+  }
+
+  /* ---------- Copie des commandes ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('[data-copy]'), function(btn){
+    btn.addEventListener('click', function(ev){
+      ev.preventDefault();
+      var text = btn.getAttribute('data-copy');
+      var done = function(){ btn.textContent = 'Copié'; setTimeout(function(){ btn.textContent = 'Copier'; }, 1400); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function(){});
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+    });
+  });
+
+  /* ---------- Raccourcis clavier ---------- */
+  document.addEventListener('keydown', function(ev){
+    if (ev.metaKey || ev.ctrlKey || ev.altKey) return;
+    var tag = (ev.target && ev.target.tagName) || '';
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag)) return;
+    if (ev.key === '1') location.href = 'GestiProj/index.html';
+    else if (ev.key === '2') location.href = 'google-sheets-dashboard/index.html';
+    else if (ev.key === 't' || ev.key === 'T') toggleTheme();
+  });
+})();
+</script>
+</body>
+</html>
