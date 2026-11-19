@@ -28,39 +28,51 @@ def google_read(url):
         return raw.decode('utf-8-sig')
 
 
+def public_sheet_data(query):
+    """Relais de lecture anonyme d'un Google Sheet partagé (lien « Lecteur »).
+
+    Fonction partagée avec le lanceur racine ``launch.py`` : elle ne lit jamais
+    que des URL ``docs.google.com`` construites à partir d'un identifiant validé.
+    Lève ``ValueError`` pour une demande invalide ou refusée par Google.
+    """
+    q = urllib.parse.parse_qs(query)
+    sid = q.get('id', [''])[0]
+    gid = q.get('gid', [''])[0]
+    if not re.fullmatch(r'[A-Za-z0-9_-]{20,150}', sid):
+        raise ValueError('Identifiant de fichier invalide.')
+    base = 'https://docs.google.com/spreadsheets/d/' + sid + '/'
+    if gid:
+        if not re.fullmatch(r'-?\d{1,15}', gid):
+            raise ValueError('Identifiant d’onglet invalide.')
+        text = google_read(base + 'export?format=csv&gid=' + gid)
+        if text.lstrip().lower().startswith(('<!doctype', '<html')):
+            raise ValueError('Export refusé. Vérifiez le partage et l’autorisation de téléchargement.')
+        rows = list(csv.reader(io.StringIO(text)))
+        if sum(map(len, rows)) > 2000000:
+            raise ValueError('Plus de 2 millions de cellules : utilisez un onglet plus petit.')
+        return {'rows': rows}
+    text = google_read(base + 'htmlview')
+    tabs = re.findall(r'items\.push\(\{name: ("(?:[^"\\]|\\.)*"),.*?gid: "(-?\d+)"', text)
+
+    def js_string(value):
+        value = re.sub(r'\\x([0-9a-fA-F]{2})', lambda m: '\\u00' + m[1], value)
+        return json.loads(value)
+
+    if not tabs:
+        raise ValueError('Onglets inaccessibles. Vérifiez le partage Lecteur ; sinon utilisez le mode Google privé.')
+    title = re.search(r'<title>(.*?)</title>', text, re.S)
+    return {'spreadsheetId': sid, 'properties': {'title': html.unescape(title[1]) if title else 'Google Sheets partagé', 'timeZone': 'UTC'}, 'sheets': [{'properties': {'sheetId': int(g), 'title': js_string(n), 'gridProperties': {}}} for n, g in tabs]}
+
+
 class Handler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
-        if parsed.path != '/api/public-sheet':
+        if parsed.path not in ('/api/public-sheet', '/api/health'):
             return super().do_GET()
+        if parsed.path == '/api/health':
+            return self.json_reply(200, {'status': 'ok'})
         try:
-            q = urllib.parse.parse_qs(parsed.query)
-            sid = q.get('id', [''])[0]
-            gid = q.get('gid', [''])[0]
-            if not re.fullmatch(r'[A-Za-z0-9_-]{20,150}', sid):
-                raise ValueError('Identifiant de fichier invalide.')
-            base = 'https://docs.google.com/spreadsheets/d/' + sid + '/'
-            if gid:
-                if not re.fullmatch(r'-?\d{1,15}', gid):
-                    raise ValueError('Identifiant d’onglet invalide.')
-                text = google_read(base + 'export?format=csv&gid=' + gid)
-                if text.lstrip().lower().startswith(('<!doctype', '<html')):
-                    raise ValueError('Export refusé. Vérifiez le partage et l’autorisation de téléchargement.')
-                rows = list(csv.reader(io.StringIO(text)))
-                if sum(map(len, rows)) > 2000000:
-                    raise ValueError('Plus de 2 millions de cellules : utilisez un onglet plus petit.')
-                data = {'rows': rows}
-            else:
-                text = google_read(base + 'htmlview')
-                tabs = re.findall(r'items\.push\(\{name: ("(?:[^"\\]|\\.)*"),.*?gid: "(-?\d+)"', text)
-                def js_string(value):
-                    value = re.sub(r'\\x([0-9a-fA-F]{2})', lambda m: '\\u00' + m[1], value)
-                    return json.loads(value)
-                if not tabs:
-                    raise ValueError('Onglets inaccessibles. Vérifiez le partage Lecteur ; sinon utilisez le mode Google privé.')
-                title = re.search(r'<title>(.*?)</title>', text, re.S)
-                data = {'spreadsheetId': sid, 'properties': {'title': html.unescape(title[1]) if title else 'Google Sheets partagé', 'timeZone': 'UTC'}, 'sheets': [{'properties': {'sheetId': int(g), 'title': js_string(n), 'gridProperties': {}}} for n, g in tabs]}
-            self.json_reply(200, data)
+            self.json_reply(200, public_sheet_data(parsed.query))
         except (ValueError, urllib.error.URLError, TimeoutError, csv.Error) as error:
             self.json_reply(400, {'error': 'Lecture publique impossible. ' + str(error)})
         except Exception:
