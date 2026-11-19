@@ -52,8 +52,8 @@ a:hover{text-decoration:underline}
 }
 .logo:hover{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);text-decoration:none}
 .logo img{width:30px;height:auto;display:block}
-/* logo noir et blanc : plaque claire garantie, même en thème sombre */
-html[data-theme="dark"] .logo{background:#f4f6fb;border-color:transparent}
+/* le logo a une variante claire pour le fond sombre (voir applyLogo) */
+html[data-theme="dark"] .logo{background:var(--surface2);border-color:var(--border)}
 .brand h1{font-size:17px;margin:0;letter-spacing:-.3px}
 .brand p{margin:1px 0 0;font-size:11.5px;color:var(--muted)}
 .topbar .spacer{flex:1}
@@ -301,7 +301,7 @@ textarea.field{height:auto;padding:9px 11px;resize:vertical;min-height:76px;line
 <!-- ============ EN-TÊTE ============ -->
 <header class="topbar">
   <a class="logo" href="../index.html" title="Retour au hub Losse">
-    <img src="../assets/logo/losse-logo-96.png" alt="Losse" width="96" height="91">
+    <img id="appLogo" src="../assets/logo/losse-logo-96.png" alt="Losse" width="96" height="81" decoding="async">
   </a>
   <div class="brand">
     <h1>GestiProj</h1>
@@ -1184,8 +1184,15 @@ function saveSyncFields(){
   save();
 }
 function applyTheme(){
-  document.documentElement.setAttribute('data-theme', state.prefs.theme||'light');
-  $('#themeBtn').textContent = state.prefs.theme==='dark' ? '☀️' : '🌙';
+  const dark = (state.prefs.theme||'light') === 'dark';
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  $('#themeBtn').textContent = dark ? '☀️' : '🌙';
+  // deux variantes du logo : la claire pour le fond sombre
+  const img = $('#appLogo');
+  if(img){
+    const src = '../assets/logo/losse-logo' + (dark ? '-light' : '') + '-96.png';
+    if(img.getAttribute('data-src') !== src){ img.setAttribute('data-src', src); img.src = src; }
+  }
 }
 
 /* ---------------------------- Démarrage ---------------------------- */

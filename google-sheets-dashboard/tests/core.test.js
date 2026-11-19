@@ -1,5 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {classifyDevice,postalInfo,parseDay,detectHeader,inferMapping,processRows,spreadsheetId,calendar,splitSolutions} from '../js/data-processor.js';
+import {classifyDevice,postalInfo,parseDay,detectHeader,inferMapping,processRows,spreadsheetId,calendar,splitSolutions,setPostalReference} from '../js/data-processor.js';
+import {readFileSync} from 'node:fs';
+setPostalReference(JSON.parse(readFileSync(new URL('../js/postal-reference.json',import.meta.url),'utf8')));
 import {filterRecords} from '../js/filters.js';import {summarize,series,compare} from '../js/analytics.js';import {predict} from '../js/predictions.js';import {csvText} from '../js/exports.js';
 test('Dates ISO, françaises et série Sheets, dates impossibles',()=>{assert.equal(parseDay('2026-11-19 10:00:00'),'2026-11-19');assert.equal(parseDay('19/11/2026'),'2026-11-19');assert.equal(parseDay(46345.5),'2026-11-19');assert.equal(parseDay('2026-02-30'),null);assert.equal(parseDay('30/02/2026'),null);assert.equal(parseDay(''),null);assert.equal(parseDay('11/19/2026'),null);});
 test('Extraction ID privée et refus URL arbitraire',()=>{assert.equal(spreadsheetId('https://docs.google.com/spreadsheets/d/abcdefghijklmnopqrstuv/edit#gid=2'),'abcdefghijklmnopqrstuv');assert.throws(()=>spreadsheetId('https://evil.example/a'));});

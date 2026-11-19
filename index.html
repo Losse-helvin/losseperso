@@ -54,7 +54,7 @@ header.top{display:flex;align-items:center;gap:14px;padding:26px 0 8px}
   box-shadow:0 6px 16px -10px rgba(17,28,51,.55);
 }
 .mark img{width:34px;height:auto;display:block}
-html[data-theme="dark"] .mark{background:#f4f6fb;border-color:transparent}
+html[data-theme="dark"] .mark{background:var(--surface-2);border-color:var(--border)}
 .brand-name{font-weight:700;letter-spacing:-.02em;font-size:16px;line-height:1.2}
 .brand-name small{display:block;font-weight:500;font-size:11.5px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
 .top .spacer{flex:1}
@@ -85,12 +85,9 @@ html[data-theme="dark"] .pill.warn{color:#fbbf24;border-color:#5a4520}
 .hero-logo{position:relative;width:clamp(180px,24vw,290px);flex:none;display:grid;place-items:center}
 .hero-logo img{position:relative;width:100%;height:auto;display:block;z-index:1;
   filter:drop-shadow(0 18px 34px rgba(17,28,51,.18))}
-/* logo noir et blanc : sur fond sombre, on le pose sur une plaque claire circulaire
-   pour que le requin noir reste lisible */
-html[data-theme="dark"] .hero-logo img{
-  background:#f4f6fb;border-radius:50%;padding:9%;
-  filter:drop-shadow(0 18px 34px rgba(0,0,0,.55));
-}
+/* le logo existe en deux variantes : la version claire (noir éclairci) est
+   utilisée en thème sombre pour que les deux requins restent lisibles */
+html[data-theme="dark"] .hero-logo img{filter:drop-shadow(0 18px 34px rgba(0,0,0,.55))}
 html[data-theme="dark"] .logo-halo{background:radial-gradient(closest-side, rgba(139,149,255,.18), transparent 78%)}
 .logo-halo{
   position:absolute;inset:-18%;border-radius:50%;z-index:0;
@@ -266,14 +263,54 @@ kbd{
   .app-foot{padding:14px 18px;flex-wrap:wrap}
   .doc-link{margin-left:0}
 }
-@media print{ body{background:#fff} .icon-btn,.cmds,.launch-side{display:none} }
+
+/* ---------- Accessibilité & confort (règles IHM) ---------- */
+
+/* focus toujours visible, y compris au clavier seul */
+:where(a,button,[data-copy]):focus-visible{
+  outline:2px solid var(--brand);outline-offset:2px;border-radius:8px;
+}
+/* cible tactile confortable (44 px) sur les commandes de l'en-tête */
+.icon-btn{min-width:40px;min-height:40px}
+.cmd button{min-height:28px}
+
+/* l'information ne repose jamais sur la seule couleur : les badges ont un texte */
+.pill .dot{outline:1px solid color-mix(in srgb,currentColor 45%,transparent);outline-offset:1px}
+
+/* respect de la préférence système : pas d'animation */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;
+    transition-duration:.001ms!important;scroll-behavior:auto!important}
+  .app:hover{transform:none}
+}
+/* lisibilité : le corps de texte reste >= 15 px, interlignage confortable */
+body{font-size:15px;line-height:1.6}
+p{max-width:70ch}
+
+/* sélection de texte aux couleurs de la marque */
+::selection{background:color-mix(in srgb,var(--brand) 26%,transparent)}
+
+/* images décoratives : pas de décalage de mise en page au chargement */
+.hero-logo img{aspect-ratio:256/216}
+.mark img{aspect-ratio:96/81}
+
+/* à l'impression : uniquement le contenu utile */
+@media print{
+  body{background:#fff}
+  .icon-btn,.cmds,.launch-side,.notice,.win-link,header.top .pill{display:none!important}
+  .app{box-shadow:none;border-color:#ccc}
+  a[href^="http"]::after{content:" (" attr(href) ")";font-size:10px;color:#666}
+}
+
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <header class="top">
-    <div class="mark" aria-hidden="true"><img src="assets/logo/losse-logo-96.png" alt="" width="96" height="91"></div>
+    <div class="mark" aria-hidden="true">
+      <img id="markLogo" src="assets/logo/losse-logo-96.png" alt="" width="96" height="81" decoding="async">
+    </div>
     <div class="brand-name">Losse Hub<small>Deux applications, un point d'entrée</small></div>
     <div class="spacer"></div>
     <span class="pill" id="serveur" title="État du lanceur local">
@@ -294,7 +331,7 @@ kbd{
     </div>
     <div class="hero-logo">
       <div class="logo-halo" aria-hidden="true"></div>
-      <img src="assets/logo/losse-logo-512.png" width="512" height="484"
+      <img id="heroLogo" src="assets/logo/losse-logo-256.png" width="256" height="216"
            alt="Logo Losse : deux requins-marteaux en formation circulaire"
            fetchpriority="high" decoding="async">
     </div>
@@ -422,11 +459,41 @@ kbd{
   try { stored = localStorage.getItem('hub-theme'); } catch (e) {}
   var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   var theme = stored || (prefersDark ? 'dark' : 'light');
+  /* Deux variantes du logo : la claire (noir éclairci) pour le fond sombre,
+     sinon les requins noirs disparaîtraient. Fichiers servis en WebP quand c'est possible. */
+  var LOGOS = {
+    light: { hero: 'assets/logo/losse-logo-256.png', mark: 'assets/logo/losse-logo-96.png' },
+    dark:  { hero: 'assets/logo/losse-logo-light-256.png', mark: 'assets/logo/losse-logo-light-96.png' }
+  };
+  var webp = (function(){
+    try {
+      var c = document.createElement('canvas');
+      return c.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+    } catch (e) { return false; }
+  })();
+  function logoUrl(path){
+    return webp ? path.replace(/\.png$/, '.webp') : path;
+  }
+  function applyLogo(){
+    var set = LOGOS[theme === 'dark' ? 'dark' : 'light'];
+    var hero = document.getElementById('heroLogo');
+    var mark = document.getElementById('markLogo');
+    if (hero && hero.getAttribute('data-src') !== set.hero) {
+      hero.setAttribute('data-src', set.hero);
+      hero.src = logoUrl(set.hero);
+    }
+    if (mark && mark.getAttribute('data-src') !== set.mark) {
+      mark.setAttribute('data-src', set.mark);
+      mark.src = logoUrl(set.mark);
+    }
+  }
+
   function applyTheme(){
     root.setAttribute('data-theme', theme);
     var btn = document.getElementById('theme');
     btn.textContent = theme === 'dark' ? '☀️' : '🌙';
     btn.setAttribute('aria-label', theme === 'dark' ? 'Passer au thème clair' : 'Passer au thème sombre');
+    applyLogo();
   }
   function toggleTheme(){
     theme = theme === 'dark' ? 'light' : 'dark';

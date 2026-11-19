@@ -1,32 +1,40 @@
 # Logo Losse
 
-Logo fourni par le propriétaire du dépôt : **deux requins-marteaux noir et blanc en formation
-yin-yang** (`Requin yin-yang noir et blanc (1).png`). L'image source possède déjà un vrai canal alpha ;
-elle a été recadrée sur son contenu puis exportée aux tailles ci-dessous, **sans altération de l'œuvre**.
+Logo fourni par le propriétaire du dépôt : **deux requins-marteaux en formation yin-yang**.
+Fichier source `Requin_yin-yang_noir_et_blanc__1_-removebg-preview.png` (fond déjà détouré,
+vrai canal alpha). Il a été simplement recadré et décliné, **sans retouche de l'œuvre**.
 
-⚠️ Ce logo est **noir et blanc** : le requin noir disparaît sur un fond sombre. Les interfaces
-le posent donc sur une **plaque claire** (`#f4f6fb`) en thème sombre, et directement sur le fond
-en thème clair. Ne pas l'afficher sans support sur un fond foncé.
+## Deux variantes, pour deux fonds
+
+Le logo étant noir et blanc, le requin noir disparaît sur un fond sombre. Deux jeux de fichiers
+sont donc fournis :
+
+| Variante | Fond | Fichiers |
+|---|---|---|
+| **Standard** | clair | `losse-logo-*.png` / `.webp` |
+| **Claire** | sombre — corps noir éclairci, contours conservés | `losse-logo-light-*.png` / `.webp` |
+
+Le choix est automatique selon le thème (voir `applyLogo()` dans `index.html`,
+`applyTheme()` dans GestiProj, `applyBrandLogo()` dans Clair). **Ne pas afficher la variante
+standard sur un fond sombre** : le requin noir y devient invisible.
+
+## Fichiers
 
 | Fichier | Taille | Usage |
 |---|---|---|
-| `losse-logo.png` | 1024 px | source haute résolution (impression, partage) |
-| `losse-logo-512.png` | 512 px | logo du hero de la page d'accueil |
-| `losse-logo-192.png` | 192 px | icône PWA / partage, logo de Clair |
+| `losse-logo.png` | 1024 px | source haute résolution (hors ligne, partage) |
+| `losse-logo-512.png` / `.webp` | 512 px | usage large / print |
+| `losse-logo-256.png` / `.webp` | 256 px | hero de la page d'accueil |
+| `losse-logo-192.png` | 192 px | icône de partage, logo de Clair |
 | `losse-logo-96.png` | 96 px | en-tête de GestiProj, marque du hub |
+| `losse-logo-light-*` | mêmes tailles | variante pour les thèmes sombres |
+| `losse-mark*.png` | 512 / 64 | version carrée centrée |
 | `favicon.ico` | 16/32/48/64 | onglet du navigateur |
 | `apple-touch-icon.png` | 180 px | écran d'accueil iOS/macOS |
-| `losse-mark.png`, `losse-mark-64.png` | 512 / 64 | version carrée centrée |
 
-## Où il est utilisé
-
-- `index.html` (hub) : marque de l'en-tête et grand logo du hero ;
-- `GestiProj/index.html` : à la place de la pastille « G », et cliquable pour revenir au hub ;
-- `google-sheets-dashboard/index.html` (Clair) : à la place de la pastille « c. » ;
-- favicon des trois pages.
+Les `.webp` sont servis en priorité par le hub quand le navigateur les accepte (poids divisé
+par ~3), avec repli automatique en PNG.
 
 ## Couleurs
 
-Le logo s'appuie sur un bleu marine (`#0f3352` environ) et un bleu clair (`#a9c6e4`).
-Il reste lisible sur les deux thèmes ; sur fond sombre, l'intérieur des requins apparaît en
-blanc franc, sans contour gris résiduel.
+Noir profond et gris bleuté (`#e9eef5`). Contraste vérifié sur fond clair comme sur fond sombre.

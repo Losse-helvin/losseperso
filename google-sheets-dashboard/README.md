@@ -83,6 +83,17 @@ jusqu'au contenu), se referment par ✕ ou `Échap`. Elles restent à jour à ch
 filtre et se referment quand la source de données est réinitialisée. En impression, les zones
 masquées sont réintégrées afin de ne rien perdre du rapport.
 
+## Performance (ajout)
+
+- Le **référentiel postal** (5 800 codes, ~580 Ko) n'est plus importé avec le module de traitement :
+  il est stocké en `js/postal-reference.json` et **téléchargé à la demande**, uniquement si une
+  colonne code postal est effectivement mappée. Sans colonne code postal, zéro octet chargé.
+- Si le référentiel est indisponible, l'analyse continue : les villes simplement ne sont pas
+  déduites du code postal, avec un message explicite (aucune ville inventée).
+- Les tests injectent le référentiel via `setPostalReference()` au lieu de l'importer.
+- Logo servi en **WebP** quand le navigateur l'accepte, avec repli PNG, et variante claire
+  automatique pour le thème sombre.
+
 ## Fonctionnalités
 
 - Métadonnées du classeur et liste de ses onglets, chargement par blocs de 2 000 lignes.
