@@ -10,7 +10,12 @@ Chaque projet possède : **un nom, une durée, des étapes, une priorité**, mai
 
 1. Dézippez `GestiProj.zip`.
 2. **Double-cliquez sur `index.html`** → l'application s'ouvre dans votre navigateur.
-3. C'est tout. 5 projets de démonstration sont déjà présents pour découvrir l'outil.
+3. C'est tout : **vos 10 projets réels sont déjà chargés** (issus de l'export `gestiproj-2026-11-19.csv`).
+
+> Les données réelles vivent dans `data/projets.js`. Elles ne sont chargées **qu'au premier démarrage**,
+> quand le navigateur ne contient encore aucune donnée. Ensuite, le `localStorage` fait foi : pour
+> réimporter un nouvel export, utilisez **⬆ Importer CSV** dans l'application, ou régénérez le fichier avec
+> `python3 tools/import-gestiproj.py votre-export.csv` (depuis la racine du dépôt) puis videz le stockage du site.
 
 > Tout fonctionne en `file://` : aucune bibliothèque externe, aucun serveur, aucun compte.
 > Les données sont sauvegardées dans le **localStorage du navigateur** (elles restent après fermeture).
@@ -35,6 +40,12 @@ Chaque projet possède : **un nom, une durée, des étapes, une priorité**, mai
 | **Sauvegarde JSON** | Export/restauration complète (idéal pour changer de navigateur). |
 | **Thème clair / sombre** | Bouton 🌙 en haut à droite. |
 | **Duplication / suppression** | Icônes ✎ ⧉ 🗑 sur chaque ligne. |
+
+### Basculer vers Clair
+Le bouton **Clair · Analytics** en haut à droite ouvre l'autre application du dépôt
+(`google-sheets-dashboard/`) dans une **fenêtre séparée**, sans fermer GestiProj.
+Les deux outils restent donc côte à côte. Si le navigateur bloque la fenêtre,
+un onglet est ouvert à la place.
 
 ### Raccourcis
 - `Entrée` dans « Nom » → enregistre le projet.
@@ -97,6 +108,8 @@ Permet les boutons **⬆ Envoyer** et **⬇ Recevoir** depuis l'application.
 ```
 GestiProj/
 ├── index.html                 ← L'APPLICATION COMPLÈTE (HTML + CSS + JS intégrés)
+├── data/
+│   └── projets.js             ← Données réelles chargées au premier démarrage
 ├── exemple-projets.csv        ← Exemple de base de données compatible Google Sheets
 ├── README.md                  ← Ce fichier
 ├── google-sheets/

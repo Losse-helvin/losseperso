@@ -133,6 +133,12 @@ html[data-theme="light"] .app.gesti .open{background:var(--green)}
 html[data-theme="light"] .app.clair .open{background:var(--violet)}
 html[data-theme="dark"] .open{color:#0d1117}
 .app:hover .open{filter:brightness(1.06)}
+.win-link{
+  position:relative;z-index:2;font-size:12px;font-weight:600;color:var(--muted);
+  text-decoration:none;border:1px solid var(--border);border-radius:8px;
+  padding:4px 9px;white-space:nowrap;transition:border-color .15s,color .15s;
+}
+.win-link:hover{color:var(--text);border-color:var(--border-strong)}
 .doc-link{
   margin-left:auto;font-size:12.5px;font-weight:600;color:var(--muted);
   text-decoration:none;border-bottom:1px dashed var(--border-strong);padding-bottom:1px;
@@ -273,15 +279,16 @@ kbd{
           </div>
         </div>
         <p class="desc">
-          Un tableau type Google Sheets pour gérer nom, priorité, responsable, durée et étapes.
-          Progression et statut calculés automatiquement, chronologie façon Gantt, import/export CSV.
+          Vos 10 projets réels sont déjà chargés au premier démarrage. Tableau type Google Sheets,
+          progression et statut automatiques, chronologie façon Gantt, import/export CSV.
         </p>
         <div class="tags">
-          <span>100 % local</span><span>Hors ligne</span><span>localStorage</span><span>Sans installation</span>
+          <span>Vos données</span><span>100 % local</span><span>Hors ligne</span><span>Sans installation</span>
         </div>
       </div>
       <div class="app-foot">
         <a class="open" href="GestiProj/index.html">Ouvrir GestiProj <span aria-hidden="true">→</span></a>
+        <a class="win-link" href="GestiProj/index.html" target="_blank" rel="noopener" title="Ouvrir dans une fenêtre séparée">⧉ Fenêtre</a>
         <a class="doc-link" href="GestiProj/README.md">Documentation</a>
       </div>
     </article>
@@ -306,6 +313,7 @@ kbd{
       </div>
       <div class="app-foot">
         <a class="open" href="google-sheets-dashboard/index.html">Ouvrir Clair <span aria-hidden="true">→</span></a>
+        <a class="win-link" href="google-sheets-dashboard/index.html" target="_blank" rel="noopener" title="Ouvrir dans une fenêtre séparée">⧉ Fenêtre</a>
         <a class="doc-link" href="google-sheets-dashboard/README.md">Documentation</a>
       </div>
     </article>

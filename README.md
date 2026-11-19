@@ -31,6 +31,21 @@ Le serveur sert depuis la racine du dépôt :
 Si le port demandé est occupé, le lanceur essaie les suivants (jusqu'à 10) et affiche l'adresse retenue.
 Pensez à ajouter cette origine exacte dans Google Cloud si vous utilisez OAuth.
 
+## Données réelles et navigation entre les applications
+
+- **GestiProj démarre avec vos données réelles** : `GestiProj/data/projets.js` contient les 10 projets
+  de l'export `gestiproj-2026-11-19.csv`. Ce fichier n'est lu que si le navigateur est vierge ;
+  ensuite le `localStorage` fait foi.
+  Pour régénérer ce fichier depuis un nouvel export :
+  `python3 tools/import-gestiproj.py gestiproj-2026-11-19.csv`
+  (séparateur `;` ou `,`, colonnes reconnues par leur nom). Dans un navigateur déjà utilisé,
+  passez plutôt par **⬆ Importer CSV** dans GestiProj.
+- **Bascule entre les deux applications** : GestiProj affiche un bouton **Clair · Analytics**
+  dans son en-tête ; Clair affiche un bouton **GestiProj** dans sa barre latérale. Chacun ouvre
+  l'autre application dans une **fenêtre séparée** — les deux restent donc utilisables côte à côte.
+  Si le navigateur bloque les fenêtres, un onglet est ouvert à la place.
+  La logique commune vit dans `assets/hub-nav.js`.
+
 ## Sans le lanceur
 
 Rien n'est cassé : chaque application reste utilisable comme avant.
@@ -54,5 +69,5 @@ Rien n'est cassé : chaque application reste utilisable comme avant.
 
 ```bash
 cd google-sheets-dashboard && npm test     # tests unitaires de Clair (Node 20+, sans dépendance)
-python3 -c "import ast,pathlib; [ast.parse(p.read_text()) for p in map(pathlib.Path, ['launch.py','google-sheets-dashboard/serve.py'])]"
+python3 -c "import ast,pathlib; [ast.parse(p.read_text()) for p in map(pathlib.Path, ['launch.py','google-sheets-dashboard/serve.py','tools/import-gestiproj.py'])]"
 ```
