@@ -7,6 +7,7 @@
 <!--
   GestiProj — application 100% locale (HTML/CSS/JS, aucune dépendance).
   Ouvrez simplement ce fichier dans un navigateur. Données = localStorage.
+  Premier démarrage : les projets de data/projets.js sont chargés.
   Option : synchronisation avec une Google Sheet via google-sheets/Code.gs
 -->
 <style>
@@ -61,6 +62,24 @@ a:hover{text-decoration:underline}
   border-radius:8px;display:grid;place-items:center;font-size:15px;
 }
 .icon-btn:hover{background:var(--accent-soft)}
+
+/* ---------- Bascule vers l'autre application ---------- */
+.app-switch{
+  display:inline-flex;align-items:center;gap:8px;padding:5px 12px 5px 6px;
+  border:1px solid var(--border);border-radius:99px;background:var(--surface);
+  font-size:12px;font-weight:600;color:var(--muted);text-decoration:none;
+  transition:border-color .15s,color .15s,background .15s;
+}
+.app-switch:hover{border-color:#8b7fe8;color:var(--text);background:var(--surface2);text-decoration:none}
+.app-switch:focus-visible{outline:2px solid #8b7fe8;outline-offset:2px}
+.app-switch-ico{
+  width:22px;height:22px;border-radius:50%;display:grid;place-items:center;
+  background:#efeafc;color:#6d4fbe;font-size:11px;font-weight:800;letter-spacing:-.5px;flex:none;
+}
+html[data-theme="dark"] .app-switch-ico{background:#2a2340;color:#c3aef7}
+.app-switch-txt{white-space:nowrap}
+.app-switch-txt small{display:block;font-size:9.5px;font-weight:500;color:var(--muted);letter-spacing:.02em}
+@media (max-width:640px){ .app-switch-txt small{display:none} .app-switch-txt{font-size:11px} }
 
 /* ---------- Barre d'outils ---------- */
 .wrap{padding:20px 22px 60px;max-width:1680px;margin:0 auto}
@@ -283,6 +302,11 @@ textarea.field{height:auto;padding:9px 11px;resize:vertical;min-height:76px;line
   <span class="pill off" id="syncPill" title="État de la synchronisation Google Sheets">
     <span class="dot"></span><span id="syncPillText">Local · navigateur</span>
   </span>
+  <a class="app-switch" id="btnToClair" href="../google-sheets-dashboard/index.html" target="_blank" rel="noopener"
+     title="Ouvrir Clair (Sheets Analytics) dans une fenêtre — GestiProj reste ouvert">
+    <span class="app-switch-ico" aria-hidden="true">c.</span>
+    <span class="app-switch-txt">Clair · Analytics<small>ouvrir dans une fenêtre</small></span>
+  </a>
   <button class="icon-btn" id="themeBtn" title="Changer de thème">🌙</button>
 </header>
 
@@ -452,6 +476,7 @@ Refonte du site	Haute	Marie	2026-10-20	15	[x] Cadrage | [ ] Maquettes | [ ] Dev"
 <input type="file" id="fileJson" accept=".json" hidden>
 <div class="toast-wrap" id="toasts"></div>
 
+<script src="../assets/hub-nav.js"></script>
 <script>
 /* =========================================================================
    GESTIPROJ — logique applicative (vanilla JS, aucune dépendance)
@@ -558,16 +583,31 @@ function defaultData(){
             sync:{ url:'', token:'' } }
   };
 }
+function seedData(){
+  // Données réelles fournies avec l'application (GestiProj/data/projets.js).
+  // Utilisées uniquement au premier démarrage, quand le navigateur est vierge.
+  const seed = window.GESTIPROJ_SEED;
+  if(!seed || !Array.isArray(seed.projects) || !seed.projects.length) return null;
+  return {
+    projects: seed.projects.map(normalize),
+    prefs: defaultData().prefs
+  };
+}
 function load(){
   try{
     const raw = localStorage.getItem(KEY);
+    const seeded = !raw ? seedData() : null;
+    if(seeded){
+      console.info('GestiProj : chargement des données réelles (' + seeded.projects.length + ' projets).');
+      return seeded;
+    }
     if(!raw) return defaultData();
     const d = JSON.parse(raw);
     d.projects = (d.projects||[]).map(normalize);
     d.prefs = Object.assign(defaultData().prefs, d.prefs||{});
     d.prefs.sync = Object.assign({url:'',token:''}, d.prefs.sync||{});
     return d;
-  }catch(e){ console.warn('Données illisibles, réinitialisation', e); return defaultData(); }
+  }catch(e){ console.warn('Données illisibles, réinitialisation', e); return seedData() || defaultData(); }
 }
 function save(){
   try{ localStorage.setItem(KEY, JSON.stringify(state)); }
@@ -1094,9 +1134,26 @@ function bind(){
     };
     r.readAsText(f,'UTF-8'); e.target.value='';
   });
-  $('#btnReset').addEventListener('click', ()=>askConfirm('Réinitialiser avec les 5 projets de démonstration ? Vos données actuelles seront perdues.', ()=>{
-    const prefs=state.prefs; state=defaultData(); state.prefs=prefs; commit(); toast('Données de démonstration restaurées.','ok');
-  }));
+  $('#btnReset').addEventListener('click', ()=>{
+    const seed = seedData();
+    const label = seed ? seed.projects.length + ' projets réels' : '5 projets de démonstration';
+    askConfirm('Réinitialiser avec ' + label + ' ? Vos données actuelles seront perdues.', ()=>{
+      const prefs=state.prefs; state=seed||defaultData(); state.prefs=prefs; commit();
+      toast(seed ? 'Données réelles restaurées.' : 'Données de démonstration restaurées.','ok');
+    });
+  });
+
+  // Bascule vers l'autre application : une fenêtre séparée, pour garder GestiProj ouvert.
+  // Le <a href> sert de repli natif si la fenêtre est bloquée par le navigateur.
+  $('#btnToClair').addEventListener('click', (ev)=>{
+    if(!window.LosseHubNav) return;          // repli : navigation directe du lien
+    ev.preventDefault();
+    if(window.LosseHubNav.open('clair') || window.LosseHubNav.openTab('clair')){
+      toast('Clair ouvert à côté — GestiProj reste affiché ici.','ok');
+    } else {
+      toast('Ouverture bloquée. Autorisez les fenêtres pour ce site, puis réessayez.','err');
+    }
+  });
 
   // Synchronisation
   $('#btnSync').addEventListener('click', ()=>{
@@ -1135,5 +1192,6 @@ function init(){
 document.addEventListener('DOMContentLoaded', init);
 })();
 </script>
+<script src="data/projets.js"></script>
 </body>
 </html>

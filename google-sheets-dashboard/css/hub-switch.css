@@ -1,0 +1,20 @@
+/* Bascule vers GestiProj (ajout Losse Hub) — ne modifie rien d'autre. */
+.sidebar .app-switch{
+  display:flex;align-items:center;gap:10px;margin:22px 0 0;
+  padding:9px 11px;border-radius:9px;text-decoration:none;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+  color:#dbe3f2;font-size:12px;font-weight:600;line-height:1.25;
+  transition:background .15s,border-color .15s;
+}
+.sidebar .app-switch:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.24);color:#fff}
+.sidebar .app-switch:focus-visible{outline:2px solid #8b95ff;outline-offset:2px}
+.sidebar .app-switch-ico{
+  width:26px;height:26px;border-radius:7px;flex:none;display:grid;place-items:center;
+  background:#e6f4ea;color:#137333;font-size:13px;font-weight:800;
+}
+.sidebar .app-switch-txt small{display:block;font-weight:500;font-size:9.5px;color:#8e9cb4;letter-spacing:.02em}
+@media(max-width:800px){
+  .sidebar .app-switch{margin-top:14px;width:max-content}
+  .sidebar .app-switch-txt small{display:none}
+}
+@media print{ .sidebar .app-switch{display:none!important} }
