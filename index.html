@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Losse Hub — GestiProj & Clair</title>
 <meta name="description" content="Point d'entrée unique vers GestiProj (gestion de projets) et Clair (analytique Google Sheets).">
+<link rel="icon" href="assets/logo/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="assets/logo/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/logo/losse-logo-192.png">
 <style>
 :root{
   --bg:#f4f6fb; --bg-grad1:#e8edff; --bg-grad2:#eefaf3;
@@ -45,11 +48,12 @@ a{color:inherit}
 /* ---------- Barre supérieure ---------- */
 header.top{display:flex;align-items:center;gap:14px;padding:26px 0 8px}
 .mark{
-  width:42px;height:42px;border-radius:12px;flex:none;
-  background:linear-gradient(140deg,var(--brand),var(--brand-2));
-  color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px;letter-spacing:-.5px;
-  box-shadow:0 8px 18px -8px rgba(79,91,213,.9);
+  width:44px;height:44px;border-radius:12px;flex:none;overflow:hidden;
+  background:var(--surface);border:1px solid var(--border);
+  display:grid;place-items:center;
+  box-shadow:0 6px 16px -10px rgba(17,28,51,.55);
 }
+.mark img{width:38px;height:auto;display:block}
 .brand-name{font-weight:700;letter-spacing:-.02em;font-size:16px;line-height:1.2}
 .brand-name small{display:block;font-weight:500;font-size:11.5px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
 .top .spacer{flex:1}
@@ -72,7 +76,20 @@ html[data-theme="dark"] .pill.warn{color:#fbbf24;border-color:#5a4520}
 .pill.warn .dot{background:#e08a00}
 
 /* ---------- Héros ---------- */
-.hero{padding:52px 0 34px;max-width:760px}
+.hero{
+  padding:44px 0 30px;display:grid;grid-template-columns:minmax(0,1fr) auto;
+  gap:36px;align-items:center;
+}
+.hero-txt{max-width:640px}
+.hero-logo{position:relative;width:clamp(180px,24vw,290px);flex:none;display:grid;place-items:center}
+.hero-logo img{position:relative;width:100%;height:auto;display:block;z-index:1;
+  filter:drop-shadow(0 18px 34px rgba(17,28,51,.18))}
+html[data-theme="dark"] .hero-logo img{filter:drop-shadow(0 18px 34px rgba(0,0,0,.55))}
+.logo-halo{
+  position:absolute;inset:-18%;border-radius:50%;z-index:0;
+  background:radial-gradient(closest-side, color-mix(in srgb,var(--brand) 20%,transparent), transparent 78%);
+  filter:blur(6px);
+}
 .eyebrow{
   display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;
   letter-spacing:.16em;text-transform:uppercase;color:var(--brand);
@@ -225,6 +242,8 @@ kbd{
 }
 
 @media (max-width:880px){
+  .hero{grid-template-columns:1fr;gap:8px;padding:34px 0 24px}
+  .hero-logo{order:-1;width:clamp(120px,38vw,170px);justify-self:start;margin-bottom:6px}
   .apps{grid-template-columns:1fr}
   .app p.desc{min-height:0}
   .grid3{grid-template-columns:1fr}
@@ -247,7 +266,7 @@ kbd{
 <div class="wrap">
 
   <header class="top">
-    <div class="mark" aria-hidden="true">L</div>
+    <div class="mark" aria-hidden="true"><img src="assets/logo/losse-logo-96.png" alt="" width="96" height="91"></div>
     <div class="brand-name">Losse Hub<small>Deux applications, un point d'entrée</small></div>
     <div class="spacer"></div>
     <span class="pill" id="serveur" title="État du lanceur local">
@@ -257,13 +276,21 @@ kbd{
   </header>
 
   <section class="hero">
-    <span class="eyebrow">Espace de travail local</span>
-    <h1>Pilotez vos projets.<br><span class="grad">Lisez vos données.</span></h1>
-    <p>
-      Deux outils indépendants réunis derrière une seule page : <b>GestiProj</b> pour suivre
-      l'avancement des projets, <b>Clair</b> pour analyser un Google Sheets. Choisissez une
-      application, elle s'ouvre dans le même onglet.
-    </p>
+    <div class="hero-txt">
+      <span class="eyebrow">Espace de travail local</span>
+      <h1>Pilotez vos projets.<br><span class="grad">Lisez vos données.</span></h1>
+      <p>
+        Deux outils indépendants réunis derrière une seule page : <b>GestiProj</b> pour suivre
+        l'avancement des projets, <b>Clair</b> pour analyser un Google Sheets. Choisissez une
+        application, elle s'ouvre dans le même onglet.
+      </p>
+    </div>
+    <div class="hero-logo">
+      <div class="logo-halo" aria-hidden="true"></div>
+      <img src="assets/logo/losse-logo-512.png" width="512" height="484"
+           alt="Logo Losse : deux requins-marteaux en formation circulaire"
+           fetchpriority="high" decoding="async">
+    </div>
   </section>
 
   <div class="apps">
