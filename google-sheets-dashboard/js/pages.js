@@ -9,7 +9,10 @@ let detached = null;
 
 export function openDetachedPage(kind) {
   if (!window.LosseClairPages) {
-    throw new Error('Lancez d’abord « Valider et analyser cet onglet », puis rouvrez la page.');
+    throw new Error(
+      'Aucune analyse chargée : connectez un onglet et cliquez sur « Valider et analyser cet onglet », '
+      + 'ou utilisez « Explorer avec des données fictives », puis rouvrez cette page.'
+    );
   }
   const size = kind === 'records' ? 'width=1180,height=900' : 'width=1040,height=900';
   const url = new URL('page.html?page=' + encodeURIComponent(kind), location.href).href;
