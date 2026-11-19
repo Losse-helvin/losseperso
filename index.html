@@ -8,17 +8,20 @@
 <link rel="icon" href="assets/logo/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="assets/logo/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/logo/losse-logo-192.png">
+<!-- Thème appliqué avant le premier rendu : aucun flash clair en thème sombre. -->
+<script src="assets/theme.js"></script>
 <style>
 :root{
   --bg:#f4f6fb; --bg-grad1:#e8edff; --bg-grad2:#eefaf3;
   --surface:#ffffff; --surface-2:#f8fafc; --border:#e2e8f0; --border-strong:#cbd5e1;
-  --text:#111c33; --muted:#67748b; --faint:#94a3b8;
+  --text:#111c33; --muted:#616e85; --faint:#94a3b8;
   --brand:#4f5bd5; --brand-2:#6d7bf0;
   --green:#188038; --green-soft:#e6f4ea;
   --violet:#6d4fbe; --violet-soft:#efeafc;
   --shadow:0 1px 2px rgba(17,28,51,.05),0 12px 32px -12px rgba(17,28,51,.18);
   --shadow-hover:0 2px 4px rgba(17,28,51,.06),0 24px 48px -16px rgba(17,28,51,.28);
   --radius:18px;
+  --warn-bg:#fff8ec; --warn-border:#f5c078; --warn-text:#8a5300;
 }
 html[data-theme="dark"]{
   --bg:#0d1117; --bg-grad1:#141d33; --bg-grad2:#0f1f1a;
@@ -29,6 +32,7 @@ html[data-theme="dark"]{
   --violet:#b39cf5; --violet-soft:#221a33;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 16px 40px -16px rgba(0,0,0,.6);
   --shadow-hover:0 2px 6px rgba(0,0,0,.5),0 28px 56px -20px rgba(0,0,0,.75);
+  --warn-bg:#2a2010; --warn-border:#5a4520; --warn-text:#fbbf24;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -72,8 +76,7 @@ html[data-theme="dark"] .mark{background:var(--surface-2);border-color:var(--bor
 .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--faint)}
 .pill.ok{color:var(--green);border-color:color-mix(in srgb,var(--green) 35%,var(--border))}
 .pill.ok .dot{background:var(--green);box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 18%,transparent)}
-.pill.warn{color:#b45309;border-color:#f5c078}
-html[data-theme="dark"] .pill.warn{color:#fbbf24;border-color:#5a4520}
+.pill.warn{color:var(--warn-text);border-color:var(--warn-border)}
 .pill.warn .dot{background:#e08a00}
 
 /* ---------- Héros ---------- */
@@ -224,10 +227,9 @@ html[data-theme="dark"] .open{color:#0d1117}
 /* ---------- Bandeau d'alerte ---------- */
 .notice{
   display:none;gap:12px;align-items:flex-start;margin-top:20px;
-  border:1px solid #f5c078;background:#fff8ec;color:#8a5300;
+  border:1px solid var(--warn-border);background:var(--warn-bg);color:var(--warn-text);
   border-radius:12px;padding:14px 16px;font-size:13.5px;
 }
-html[data-theme="dark"] .notice{background:#2a2010;border-color:#5a4520;color:#fbbf24}
 .notice.show{display:flex}
 .notice b{display:block;margin-bottom:2px}
 
@@ -313,7 +315,8 @@ p{max-width:70ch}
     <span class="pill" id="serveur" title="État du lanceur local">
       <span class="dot"></span><span id="serveurTxt">Vérification…</span>
     </span>
-    <button class="icon-btn" id="theme" title="Changer de thème" aria-label="Changer de thème">🌙</button>
+    <button class="icon-btn" id="theme" type="button" data-theme-toggle
+          title="Changer de thème" aria-label="Changer de thème"><span data-theme-icon aria-hidden="true">🌙</span></button>
   </header>
 
   <section class="hero">
@@ -442,7 +445,7 @@ p{max-width:70ch}
 
   <footer>
     <span>Losse Hub — lanceur local des deux applications du dépôt.</span>
-    <span class="kbd-hint">Raccourcis : <kbd>1</kbd> GestiProj <kbd>2</kbd> Clair <kbd>T</kbd> thème</span>
+    <span class="kbd-hint">Raccourcis : <kbd>1</kbd> GestiProj <kbd>2</kbd> Clair <kbd>T</kbd> thème <kbd>Maj</kbd>+<kbd>T</kbd> suivre le système</span>
   </footer>
 
 </div>
@@ -452,25 +455,9 @@ p{max-width:70ch}
   'use strict';
   var root = document.documentElement;
 
-  /* ---------- Thème : mémorisé, sinon préférence système ---------- */
-  var stored = null;
-  try { stored = localStorage.getItem('hub-theme'); } catch (e) {}
-  var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  var theme = stored || (prefersDark ? 'dark' : 'light');
-  function applyTheme(){
-    root.setAttribute('data-theme', theme);
-    var btn = document.getElementById('theme');
-    btn.textContent = theme === 'dark' ? '☀️' : '🌙';
-    btn.setAttribute('aria-label', theme === 'dark' ? 'Passer au thème clair' : 'Passer au thème sombre');
-  }
-  function toggleTheme(){
-    theme = theme === 'dark' ? 'light' : 'dark';
-    try { localStorage.setItem('hub-theme', theme); } catch (e) {}
-    applyTheme();
-  }
-  document.getElementById('theme').addEventListener('click', toggleTheme);
-  applyTheme();
-
+  /* ---------- Thème ----------
+     Le choix est géré par assets/theme.js : mémorisé et partagé avec GestiProj
+     et Clair. Ce fichier ne fait que câbler les raccourcis clavier. */
   /* ---------- État du lanceur : page servie en http ou ouverte en file:// ---------- */
   var notice = document.getElementById('notice');
   var pill = document.getElementById('serveur');
@@ -517,7 +504,10 @@ p{max-width:70ch}
     if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag)) return;
     if (ev.key === '1') location.href = 'GestiProj/index.html';
     else if (ev.key === '2') location.href = 'google-sheets-dashboard/index.html';
-    else if (ev.key === 't' || ev.key === 'T') toggleTheme();
+    else if (ev.key === 't' || ev.key === 'T') {
+      /* T bascule clair ↔ sombre ; Maj+T revient au suivi du système. */
+      if (window.LosseTheme) (ev.shiftKey ? window.LosseTheme.clear() : window.LosseTheme.toggle());
+    }
   });
 })();
 </script>

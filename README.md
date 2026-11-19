@@ -62,6 +62,27 @@ volumineux qui allongeaient beaucoup le dashboard :
 - L'état `aria-expanded` est tenu à jour et le focus revient au bouton à la fermeture.
 - À l'impression, les contenus masqués sont **réintégrés** pour que le rapport reste complet.
 
+## Thème clair et thème sombre
+
+Les **trois pages** (hub, GestiProj, Clair) proposent le même réglage, avec exactement le même
+comportement — un seul moteur, `assets/theme.js` :
+
+| | |
+|---|---|
+| **Bouton** | icône 🌙 / ☀️ dans l'en-tête, libellé explicite (« Thème sombre » / « Thème clair ») |
+| **Raccourci** | <kbd>T</kbd> sur le hub ; <kbd>Maj</kbd>+<kbd>T</kbd> ou <kbd>Alt</kbd>+clic pour revenir au suivi du système |
+| **Choix par défaut** | celui du système (`prefers-color-scheme`), suivi en direct si l'utilisateur change |
+| **Mémorisation** | `localStorage['losse-theme']`, **commun aux trois pages** : régler le thème sur le hub l'applique à GestiProj et Clair |
+| **Sans clignotement** | le thème est appliqué avant le premier rendu (script en `<head>`, sans `defer`) |
+| **Impression** | le thème sombre est ignoré : le papier reste blanc |
+
+Les graphiques de Clair sont systématiquement redessinés au changement de thème (Chart.js fige les
+couleurs au moment du tracé) ; les icônes sont régénérées de la même façon.
+
+**Le logo n'est pas concerné** : aucune variante n'est produite ni choisie selon le thème. Sur fond
+clair seul le requin noir se détache, sur fond sombre seul le requin blanc reste visible — c'est
+l'effet recherché (voir `assets/logo/README.md`).
+
 ## Design et accessibilité
 
 - **Logo volontairement contrasté par le fond** : sur fond clair seul le requin noir se détache,
