@@ -1,0 +1,4 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {recommendations} from '../js/decisions.js';
+test('Conseils : sélection vide et suivi manquant',()=>{assert.match(recommendations([],[])[0].title,/insuffisantes/);assert.match(recommendations([['Non attribuée',4]],[],{kind:'source'})[0].text,/UTM/);});
+test('Conseils : petits volumes, absence de base et filtre unique',()=>{const s=recommendations([['SEO',5]],[],{kind:'source',single:true}).map(x=>x.title+' '+x.text).join(' ');assert.match(s,/petit échantillon/);assert.match(s,/base absente/);assert.match(s,/filtre/);assert.match(s,/pas augmenter le budget/);});
+test('Conseils : variation factuelle et concentration',()=>{const s=recommendations([['A',80],['B',20]],[['A',40]],{kind:'form'}).map(x=>x.text).join(' ');assert.match(s,/100.0 %/);assert.match(s,/70 %/);assert.match(s,/champs/);});

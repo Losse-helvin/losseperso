@@ -1,0 +1,6 @@
+ID;Nom;Priorité;Responsable;Début;Durée;Fin;Étapes;Progression;Statut;Description
+p_demo_01;Refonte du site web;Haute;Marie;2026-10-20;21;2026-11-09;"[x] Cadrage & audit | [x] Maquettes UI | [ ] Intégration HTML/CSS | [ ] Tests & mise en ligne";50%;En cours;Nouvelle identité visuelle et migration du contenu.
+p_demo_02;Campagne marketing T4;Moyenne;Paul;2026-10-28;30;2026-11-26;"[x] Définir le budget | [ ] Créer les visuels | [ ] Programmer les publications";33%;À venir;Préparation des supports et planning de diffusion.
+p_demo_03;Migration base de données;Haute;Sophie;2026-10-12;10;2026-10-21;"[x] Sauvegarde complète | [ ] Script de migration | [ ] Validation";33%;En retard;Serveur obsolète — action urgente.
+p_demo_04;Formation équipe;Basse;Ali;2026-10-23;12;2026-11-03;"[x] Planifier les sessions | [x] Supports de formation | [x] Session 1 | [ ] Session 2";75%;En cours;Monter en compétences sur les nouveaux outils.
+p_demo_05;Tableau de bord commercial;Moyenne;Marie;2026-10-21;14;2026-11-03;"[x] Collecte des KPI | [x] Maquette du dashboard | [x] Développement | [x] Recette";100%;Terminé;Suivi des indicateurs de vente.

@@ -1,0 +1,7 @@
+const SCOPE='https://www.googleapis.com/auth/spreadsheets.readonly';
+let token=null,expires=0,client=null,onChange=()=>{},timer;
+export function initAuth(callback){onChange=callback;}
+export function getToken(){if(!token||Date.now()>=expires){expire();throw new Error('Session Google absente ou expirée. Cliquez sur « Connecter avec Google ».');}return token;}
+export function expire(){token=null;expires=0;clearTimeout(timer);onChange(false);}
+export function login(){const id=window.APP_CONFIG?.clientId;if(!id)throw new Error('Client ID manquant. Configurez config/config.js avec votre identifiant OAuth Google Cloud de type Application Web.');if(!window.google?.accounts?.oauth2)throw new Error('Google Identity Services indisponible. Vérifiez votre connexion et les bloqueurs de scripts.');if(!client)client=google.accounts.oauth2.initTokenClient({client_id:id,scope:SCOPE,include_granted_scopes:false,callback:r=>{if(r.error){expire();onChange(false,new Error(r.error_description||r.error));return;}token=r.access_token;expires=Date.now()+Math.max(0,(Number(r.expires_in)-60))*1000;clearTimeout(timer);timer=setTimeout(expire,Math.max(0,expires-Date.now()));onChange(true);},error_callback:r=>onChange(false,new Error(r.type==='popup_closed'?'Fenêtre Google fermée. Vous pouvez réessayer.':r.type||'Échec de connexion Google.'))});client.requestAccessToken({prompt:''});}
+export function logout(){const old=token;expire();if(old&&window.google?.accounts?.oauth2)google.accounts.oauth2.revoke(old,()=>{});}
