@@ -52,8 +52,11 @@ Deux boutons de Clair ouvrent un contenu dans une **page dédiée** (fenêtre s�
 
 | Bouton | Emplacement | Contenu de la page |
 |---|---|---|
-| **Ouvrir dans une page** | blocs « Décisions & améliorations · formulaires » et « · sources » | décisions formulaires, décisions sources et « Ce que disent vos données » |
-| **Ouvrir dans une page** | bloc « La donnée derrière les chiffres » | tableau des 100 premières lignes filtrées |
+| **Décisions & données** ou **Ouvrir dans une page** | barre supérieure ; blocs « Décisions & améliorations · formulaires » et « · sources » | décisions formulaires, décisions sources et « Ce que disent vos données » |
+| **Tableau des données** ou **Ouvrir dans une page** | barre supérieure ; bloc « La donnée derrière les chiffres » | tableau des 100 premières lignes filtrées |
+
+Les deux accès de la **barre supérieure** évitent d'avoir à parcourir la page jusqu'aux blocs
+correspondants, le dashboard étant long.
 
 Fichier : `google-sheets-dashboard/page.html` ; la logique d'ouverture est dans `js/pages.js`.
 Les données sont **transmises par le dashboard** (`window.LosseClairPages`, même origine) : aucun

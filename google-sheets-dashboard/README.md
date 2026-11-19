@@ -71,8 +71,12 @@ Le projet peut être prévisualisé ici en démonstration. **Cela ne signifie pa
 
 ## Pages détachées (ajout)
 
-Trois boutons **Ouvrir dans une page** ouvrent un contenu dans une fenêtre dédiée (`page.html`),
-imprimable en PDF, sans quitter le dashboard :
+Quatre boutons ouvrent un contenu dans une fenêtre dédiée (`page.html`), imprimable en PDF,
+sans quitter le dashboard :
+
+- deux accès directs dans la **barre supérieure** — **Décisions & données** et
+  **Tableau des données** — pour ne pas avoir à défiler jusqu'aux blocs concernés ;
+- deux boutons **Ouvrir dans une page** au plus près des blocs eux-mêmes ;
 
 - sous « Décisions & améliorations · formulaires » et « · sources » : une page réunissant
   les décisions formulaires, les décisions sources et « Ce que disent vos données » ;

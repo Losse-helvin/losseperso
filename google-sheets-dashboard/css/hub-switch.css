@@ -41,3 +41,23 @@
 .page-link svg{width:13px;height:13px}
 .chart-heading .outline.small svg{width:13px;height:13px;flex:none}
 @media print{ .page-link{display:none!important} }
+
+/* ---------- Accès direct aux pages dédiées, depuis la barre supérieure ----------
+   Objectif : ne plus avoir à défiler jusqu'aux blocs Décisions / Données. */
+.topbar .top-actions #decisionsPage,
+.topbar .top-actions #recordsPageTop{border-color:var(--line);color:var(--ink);white-space:nowrap}
+.topbar .top-actions #decisionsPage:hover,
+.topbar .top-actions #recordsPageTop:hover{border-color:var(--brand);color:var(--brand)}
+.topbar .top-actions #decisionsPage svg,
+.topbar .top-actions #recordsPageTop svg{width:14px;height:14px;flex:none}
+@media(max-width:1200px){
+  .topbar .top-actions #decisionsPage,
+  .topbar .top-actions #recordsPageTop{font-size:11px;padding:8px 10px}
+}
+@media(max-width:800px){
+  /* sur mobile, la barre passe à la ligne : libellés courts, icônes conservées */
+  .topbar .top-actions{flex-wrap:wrap;justify-content:flex-end}
+  .topbar .top-actions #decisionsPage,
+  .topbar .top-actions #recordsPageTop{padding:7px 9px}
+}
+@media print{ #decisionsPage,#recordsPageTop{display:none!important} }
