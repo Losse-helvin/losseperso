@@ -8,7 +8,6 @@ import {counts,periodOf,series,aggregateSeries,summarize,insights} from './analy
 import {predict} from './predictions.js';
 import {renderCharts,clearCharts} from './charts.js';
 import {exportCsv,exportPdf,exportPng} from './exports.js';
-import {openDetachedPage,pingDetachedPage} from './pages.js';
 const $=id=>document.getElementById(id);let authenticated=false,file=null,pending=null,model=null,lastReport=null,timer=null,controller=null,busy=false,epoch=0;
 const names={device:'Appareil déclaré',userAgent:'Navigateur / User-Agent',postalCode:'Code postal',date:'Date / horodatage',id:'Identifiant du lead',form:'Formulaire',source:'Source',campaign:'Campagne',city:'Ville',region:'Région',solution:'Solutions'};
 function iconRefresh(){window.lucide?.createIcons();}
@@ -16,7 +15,7 @@ function message(text,error=false){$('message').hidden=!text;$('message').textCo
 function safeRun(fn){return async()=>{try{await fn();}catch(e){if(e.name!=='AbortError')message(e.message,true);}};}
 function setBusy(value){busy=value;['connect','previewBtn','validate','refresh'].forEach(id=>$(id).disabled=value);}
 function stopAuto(){clearInterval(timer);timer=null;$('auto').value='0';}
-function resetData(){epoch++;controller?.abort();stopAuto();file=null;pending=null;model=null;lastReport=null;clearCache();clearCharts();clearDetails();$('preview').hidden=true;$('tabs').replaceChildren(new Option('Connectez un fichier',''));$('tabs').disabled=true;$('fileTitle').textContent='Aucun fichier connecté';$('lastSync').textContent='Jamais synchronisé';$('scopeText').textContent='Connectez un onglet pour commencer.';populateFilters([]);resetFilters();$('dataTable').replaceChildren();$('deviceStats').replaceChildren();$('geoStats').replaceChildren();$('insights').replaceChildren();$('forecastInfo').replaceChildren();emptyKpis();}
+function resetData(){epoch++;controller?.abort();stopAuto();file=null;pending=null;model=null;lastReport=null;clearCache();clearCharts();clearDetails();$('preview').hidden=true;$('tabs').replaceChildren(new Option('Connectez un fichier',''));$('tabs').disabled=true;$('fileTitle').textContent='Aucun fichier connecté';$('lastSync').textContent='Jamais synchronisé';$('scopeText').textContent='Connectez un onglet pour commencer.';populateFilters([]);resetFilters();$('dataTable').replaceChildren();$('deviceStats').replaceChildren();$('geoStats').replaceChildren();$('insights').replaceChildren();$('forecastInfo').replaceChildren();emptyKpis();setZone('decisions',false,false);setZone('records',false,false);}
 initAuth((ok,error)=>{const was=authenticated;authenticated=ok;$('auth').hidden=ok;$('logout').hidden=!ok;$('status').textContent=ok?'Google connecté':'Hors connexion';$('status').classList.toggle('connected',ok);if(!ok&&was)resetData();if(error)message(error.message,true);else if(ok)message('Compte autorisé en lecture seule. Collez l’URL de votre fichier privé.');});
 function emptyKpis(){renderKpis([{title:'Lignes / leads',value:'—',note:'En attente d’une source',icon:'users'},{title:'Cette période',value:'—',note:'Comparaison de même durée',icon:'calendar-days'},{title:'Formulaires actifs',value:'—',note:'Identifiants distincts observés',icon:'panels-top-left'},{title:'Moyenne quotidienne',value:'—',note:'Calendrier incluant les jours à zéro',icon:'trending-up'}]);}
 function renderKpis(items){$('kpis').replaceChildren(...items.map(x=>{const el=document.createElement('article');el.className='kpi panel';const top=document.createElement('div');top.className='kpi-top';const title=document.createElement('span');title.textContent=x.title;const icon=document.createElement('span');icon.className='kpi-icon';const i=document.createElement('i');i.setAttribute('data-lucide',x.icon);icon.append(i);top.append(title,icon);const value=document.createElement('div');value.className='kpi-value';value.textContent=x.value;const note=document.createElement('div');note.className='kpi-note';note.textContent=x.note;el.append(top,value,note);return el;}));iconRefresh();}
@@ -36,7 +35,7 @@ renderCharts({daily:currentDaily,priorDaily,aggregated:aggregateSeries(currentDa
 const formCounts=counts(rows,'form'),sourceCounts=counts(rows,'source');
 dimensionStats('formsStats',formCounts,rows.length,'Formulaire',counts(previous,'form'));
 dimensionStats('sourcesStats',sourceCounts,rows.length,'Source',counts(previous,'source'));
-const fd=recommendations(formCounts,counts(previous,'form'),{kind:'form',single:!!filters.form});const sd=recommendations(sourceCounts,counts(previous,'source'),{kind:'source',single:!!filters.source});showDecisions('formDecisions',fd);showDecisions('sourceDecisions',sd);exportPages(fd,sd,rows,notes,summary,scope,period);notes.push(...fd.map(n=>({title:'Formulaires · '+n.title,text:n.text})),...sd.map(n=>({title:'Sources · '+n.title,text:n.text})));
+const fd=recommendations(formCounts,counts(previous,'form'),{kind:'form',single:!!filters.form});const sd=recommendations(sourceCounts,counts(previous,'source'),{kind:'source',single:!!filters.source});showDecisions('formDecisions',fd);showDecisions('sourceDecisions',sd);notes.push(...fd.map(n=>({title:'Formulaires · '+n.title,text:n.text})),...sd.map(n=>({title:'Sources · '+n.title,text:n.text})));
 const timelineNow=aggregateSeries(currentDaily,unit),timelineOld=aggregateSeries(priorDaily,unit);table($('timelineStats'),['Période','Leads','Précédente alignée'],timelineNow.map((x,i)=>[x.day,x.value,timelineOld[i]?.value||0]));
 table($('forecastStats'),['Date estimée','MM7 estimée','Borne basse indicative','Borne haute indicative'],prediction.available?prediction.future.map(x=>[x.day,x.value.toFixed(1),x.low.toFixed(1),x.high.toFixed(1)]):[['Données insuffisantes','—','—','—']]);
 dimensionStats('deviceStats',counts(rows,'device'),rows.length,'Appareil');dimensionStats('geoStats',counts(rows,$('geoType').value),rows.length,'Code postal / ville');
@@ -46,37 +45,37 @@ if(!window.Chart)message('Chart.js indisponible. Les calculs et tableaux restent
 }
 async function refresh(){if(!model)throw new Error('Validez d’abord un onglet.');if(model.demo){message('Démonstration fictive : aucune synchronisation Google.');return;}if(!file?.publicMode&&!authenticated)throw new Error('Reconnectez-vous à Google.');if(busy)return;setBusy(true);controller?.abort();controller=new AbortController();const version=epoch;try{const fresh=await loadTab(file.id,model.tab,{force:true,signal:controller.signal});if(version!==epoch)return;const headers=fresh.rows[model.headerIndex]||[];if(JSON.stringify(headers)!==JSON.stringify(model.rawHeaders)){stopAuto();pending=fresh;$('headerRow').value=detectHeader(fresh.rows)+1;showPreview();$('preview').hidden=false;throw new Error('La structure des en-têtes a changé. Synchronisation suspendue : validez à nouveau le mapping.');}const old=model;model={...processRows(fresh.rows,old.headerIndex,old.mapping),headerIndex:old.headerIndex,rawHeaders:old.rawHeaders,tab:fresh.tab,timeZone:fresh.meta.properties.timeZone,demo:false};populateFilters(model.records);$('lastSync').textContent='Dernière synchronisation : '+new Date().toLocaleTimeString('fr-FR');render();message('Synchronisation terminée en lecture seule.');}finally{setBusy(false);}}
 
-/* ---------- Pages détachées : « Décisions & améliorations » et « La donnée » ----------
-   Les deux pages sont rendues ici, dans la mémoire de l'application, puis exposées à la
-   fenêtre fille (même origine). Elles contiennent donc exactement les mêmes données que
-   le dashboard au moment de l'ouverture, sans second appel à Google Sheets.
-   La fenêtre est rafraîchie automatiquement quand les filtres changent. */
-export const PAGE_KINDS={decisions:'decisions',records:'records'};
-function exportPages(fd,sd,rows,notes,summary,scope,period){
-  const decisions={
-    scope,period:{start:period.start,end:period.end},generatedAt:new Date().toISOString(),
-    forms:serializeAdvice(fd),sources:serializeAdvice(sd),
-    insights:notes.map(n=>({title:n.title,text:n.text})),
-    quality:`Qualité : ${model.invalidDates} dates absentes/invalides, ${model.duplicateIds} IDs répétés. `
-      +`Remplissage des cellules : ${summary.completeness===null?'—':(summary.completeness*100).toFixed(1)+' %'} `
-      +'(tous les champs sélectionnés, y compris optionnels). Ce n’est pas un taux de complétion de formulaire : '
-      +'abandons et champs obligatoires inconnus.'
-  };
-  const records={
-    scope,period:{start:period.start,end:period.end},generatedAt:new Date().toISOString(),
-    rows:rows.slice(0,100).map(r=>({day:r.day||'',form:r.form,source:r.source,campaign:r.campaign,
-      device:r.device,postalCode:r.postalCode,city:r.city,solutions:r.solutions})),
-    total:rows.length
-  };
-  window.LosseClairPages={decisions,records,title:($('fileTitle').textContent||'Clair')};
-  pingDetached();
-}
-function serializeAdvice(items){return (items||[]).map(n=>({title:n.title,text:n.text}));}
-function pingDetached(){pingDetachedPage();}
 function demo(){controller?.abort();epoch++;stopAuto();clearCache();file=null;resetFilters();const rows=[['horodatage','id_lead','form_id','source','utm_campaign','ville','region','solution','user_agent','code_postal']];const today=localDay('Europe/Paris');for(let i=55;i>=0;i--){const count=4+Math.floor((55-i)/7)+(i*7%9);for(let j=0;j<count;j++)rows.push([shiftDay(today,-i)+' 10:30:00',`DEMO-${i}-${j}`,['FORM-SANTE','FORM-PRO','FORM-RETRAITE'][(j+i)%3],['SEO','ADW','EMAIL','ADW'][j%4],['Marque','Acquisition','Retargeting'][j%3],['Paris','Lyon','Nantes','Bordeaux'][j%4],['Île-de-France','Auvergne-Rhône-Alpes','Pays de la Loire','Nouvelle-Aquitaine'][j%4],j%3?'Prévoyance':'Santé, Prévoyance',['Android','iPhone','Windows NT','Macintosh'][j%4],['75001','69001','44000','33000'][j%4]]);}pending={rows,tab:{title:'Données fictives',sheetId:0},meta:{properties:{timeZone:'Europe/Paris'}},demo:true};$('fileTitle').textContent='Démonstration — données fictives';$('headerRow').value=1;showPreview();validate();}
 $('auth').onclick=safeRun(login);$('logout').onclick=()=>{logout();resetData();message('Déconnecté. Jeton et données supprimés de la mémoire de l’application.');};$('connect').onclick=safeRun(connectFile);$('previewBtn').onclick=safeRun(preview);$('validate').onclick=safeRun(validate);$('headerRow').onchange=safeRun(showPreview);$('refresh').onclick=safeRun(refresh);$('demo').onclick=safeRun(demo);$('tabs').onchange=()=>{$('preview').hidden=true;pending=null;stopAuto();message('Onglet sélectionné : cliquez sur Prévisualiser. Le dashboard conserve la dernière analyse validée.');};['start','end',...FILTER_FIELDS,'granularity','geoType'].forEach(id=>$(id).addEventListener('change',safeRun(render)));$('reset').onclick=safeRun(()=>{resetFilters();render();});$('auto').onchange=()=>{clearInterval(timer);const min=Number($('auto').value);if(!min)return;if(!model||model.demo||(!file?.publicMode&&!authenticated)){stopAuto();message('Validez un onglet partagé, ou connectez-vous à Google pour un fichier privé.',true);return;}timer=setInterval(()=>safeRun(refresh)(),min*60000);};$('theme').onclick=safeRun(()=>{document.body.classList.toggle('dark');try{localStorage.setItem('clair-theme',document.body.classList.contains('dark')?'dark':'light');}catch{}render();});$('csv').onclick=safeRun(()=>{if(!lastReport)throw new Error('Aucune analyse à exporter.');exportCsv(lastReport.rows);});$('pdf').onclick=safeRun(()=>{if(!lastReport)throw new Error('Aucune analyse à exporter.');return exportPdf(lastReport);});$('print').onclick=()=>window.print();document.querySelectorAll('.png').forEach(b=>b.onclick=safeRun(()=>exportPng(b.dataset.chart)));
-document.querySelectorAll('.page-link').forEach(b=>b.onclick=safeRun(()=>openDetachedPage('decisions')));
-$('recordsPage').onclick=safeRun(()=>openDetachedPage('records'));$('decisionsPage').onclick=safeRun(()=>openDetachedPage('decisions'));$('recordsPageTop').onclick=safeRun(()=>openDetachedPage('records'));window.addEventListener('load',iconRefresh);try{if(localStorage.getItem('clair-theme')==='dark')document.body.classList.add('dark');}catch{}if(window.APP_CONFIG?.defaultSheetUrl)$('sheetUrl').value=window.APP_CONFIG.defaultSheetUrl;populateFilters([]);emptyKpis();
+/* ---------- Ajout : révéler les blocs sur place, sans changer de page ----------
+   Les décisions et le tableau des données sont masqués au chargement pour raccourcir
+   la page ; ces boutons les affichent dans la page courante et défilent jusqu'à eux. */
+const REVEAL={
+  decisions:{zone:'decisionsZone',toggle:'decisionsToggle',close:'decisionsClose'},
+  records:{zone:'records',toggle:'recordsToggle',close:'recordsClose'}
+};
+function setZone(kind,open,focus){
+  const cfg=REVEAL[kind];if(!cfg)return;
+  const zone=$(cfg.zone),btn=$(cfg.toggle);if(!zone||!btn)return;
+  zone.hidden=!open;
+  btn.setAttribute('aria-expanded',String(open));
+  btn.classList.toggle('is-open',open);
+  if(!open)return;
+  if(!model)message('Aucune analyse chargée : connectez un onglet et cliquez sur « Valider et analyser cet onglet », ou utilisez la démonstration.',true);
+  if(focus!==false)requestAnimationFrame(()=>zone.scrollIntoView({behavior:'smooth',block:'start'}));
+  iconRefresh();
+}
+function toggleZone(kind){const cfg=REVEAL[kind];if(cfg)setZone(kind,$(cfg.zone).hidden);}
+Object.keys(REVEAL).forEach(kind=>{
+  const cfg=REVEAL[kind],btn=$(cfg.toggle),close=$(cfg.close);
+  if(btn)btn.onclick=()=>toggleZone(kind);
+  if(close)close.onclick=()=>{setZone(kind,false);$(cfg.toggle).focus();};
+});
+// Échap referme le contenu affiché
+document.addEventListener('keydown',ev=>{
+  if(ev.key!=='Escape')return;
+  Object.keys(REVEAL).forEach(kind=>{const z=$(REVEAL[kind].zone);if(z&&!z.hidden)setZone(kind,false);});
+});window.addEventListener('load',iconRefresh);try{if(localStorage.getItem('clair-theme')==='dark')document.body.classList.add('dark');}catch{}if(window.APP_CONFIG?.defaultSheetUrl)$('sheetUrl').value=window.APP_CONFIG.defaultSheetUrl;populateFilters([]);emptyKpis();
 
 /* ---------- Ajout Losse Hub : bascule vers GestiProj ---------- */
 (function hubSwitch(){

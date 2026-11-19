@@ -46,23 +46,21 @@ Pensez à ajouter cette origine exacte dans Google Cloud si vous utilisez OAuth.
   Si le navigateur bloque les fenêtres, un onglet est ouvert à la place.
   La logique commune vit dans `assets/hub-nav.js`.
 
-## Pages détachées de Clair
+## Blocs repliables de Clair
 
-Deux boutons de Clair ouvrent un contenu dans une **page dédiée** (fenêtre séparée, imprimable en PDF) :
+Deux boutons, placés au-dessus des tendances, **affichent dans la même page** deux contenus
+volumineux qui allongeaient beaucoup le dashboard :
 
-| Bouton | Emplacement | Contenu de la page |
-|---|---|---|
-| **Décisions & données** ou **Ouvrir dans une page** | barre supérieure ; blocs « Décisions & améliorations · formulaires » et « · sources » | décisions formulaires, décisions sources et « Ce que disent vos données » |
-| **Tableau des données** ou **Ouvrir dans une page** | barre supérieure ; bloc « La donnée derrière les chiffres » | tableau des 100 premières lignes filtrées |
+| Bouton | Contenu révélé sur place |
+|---|---|
+| **Décisions & améliorations** | décisions formulaires, décisions sources et « Ce que disent vos données » |
+| **La donnée derrière les chiffres** | tableau des 100 premières lignes filtrées |
 
-Les deux accès de la **barre supérieure** évitent d'avoir à parcourir la page jusqu'aux blocs
-correspondants, le dashboard étant long.
-
-Fichier : `google-sheets-dashboard/page.html` ; la logique d'ouverture est dans `js/pages.js`.
-Les données sont **transmises par le dashboard** (`window.LosseClairPages`, même origine) : aucun
-appel réseau supplémentaire vers Google Sheets. Les pages se **rafraîchissent automatiquement**
-quand les filtres changent, et affichent un message explicite si elles sont ouvertes seules
-(nouvel onglet ou rechargement), faute de données.
+- Contenus **masqués au chargement** : la page reste courte tant qu'on ne les demande pas.
+- Révélation **dans la page courante** (défilement automatique jusqu'au contenu), avec un bouton ✕
+  et la touche `Échap` pour refermer. Aucune fenêtre, aucun onglet, aucun rechargement.
+- L'état `aria-expanded` est tenu à jour et le focus revient au bouton à la fermeture.
+- À l'impression, les contenus masqués sont **réintégrés** pour que le rapport reste complet.
 
 ## Sans le lanceur
 

@@ -69,24 +69,19 @@ Les intitulés Google peuvent varier selon la version de la console.
 
 Le projet peut être prévisualisé ici en démonstration. **Cela ne signifie pas qu'OAuth réel a été testé avec votre compte.** Pour l'authentification dans un aperçu distant, il faudrait autoriser son origine HTTPS exacte dans votre client OAuth et ouvrir l'aperçu dans un onglet autonome ; les popups peuvent être bloquées dans un iframe. Préférez le lancement local prévu ci-dessus. Ne réutilisez pas une origine d'aperçu temporaire pour une diffusion publique.
 
-## Pages détachées (ajout)
+## Blocs repliables (ajout)
 
-Quatre boutons ouvrent un contenu dans une fenêtre dédiée (`page.html`), imprimable en PDF,
-sans quitter le dashboard :
+Le dashboard était long à parcourir. Deux **boutons de révélation** sont placés au-dessus des
+tendances ; ils affichent le contenu **dans la page courante** :
 
-- deux accès directs dans la **barre supérieure** — **Décisions & données** et
-  **Tableau des données** — pour ne pas avoir à défiler jusqu'aux blocs concernés ;
-- deux boutons **Ouvrir dans une page** au plus près des blocs eux-mêmes ;
+- **Décisions & améliorations** : décisions formulaires, décisions sources et
+  « Ce que disent vos données » ;
+- **La donnée derrière les chiffres** : les 100 premières lignes filtrées.
 
-- sous « Décisions & améliorations · formulaires » et « · sources » : une page réunissant
-  les décisions formulaires, les décisions sources et « Ce que disent vos données » ;
-- dans « La donnée derrière les chiffres » : une page avec le tableau des 100 premières
-  lignes filtrées.
-
-Les données sont lues depuis la fenêtre principale (même origine, `window.LosseClairPages`) :
-aucun nouvel appel à Sheets API, aucune écriture, aucun stockage. La page se met à jour quand
-les filtres changent. Ouverte seule (nouvel onglet, rechargement), elle affiche une invitation
-à relancer l'analyse plutôt qu'un contenu vide ou périmé.
+Les deux zones sont masquées au chargement (`hidden`), s'ouvrent par le bouton (défilement doux
+jusqu'au contenu), se referment par ✕ ou `Échap`. Elles restent à jour à chaque changement de
+filtre et se referment quand la source de données est réinitialisée. En impression, les zones
+masquées sont réintégrées afin de ne rien perdre du rapport.
 
 ## Fonctionnalités
 
