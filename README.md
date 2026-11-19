@@ -46,6 +46,21 @@ Pensez à ajouter cette origine exacte dans Google Cloud si vous utilisez OAuth.
   Si le navigateur bloque les fenêtres, un onglet est ouvert à la place.
   La logique commune vit dans `assets/hub-nav.js`.
 
+## Pages détachées de Clair
+
+Deux boutons de Clair ouvrent un contenu dans une **page dédiée** (fenêtre séparée, imprimable en PDF) :
+
+| Bouton | Emplacement | Contenu de la page |
+|---|---|---|
+| **Ouvrir dans une page** | blocs « Décisions & améliorations · formulaires » et « · sources » | décisions formulaires, décisions sources et « Ce que disent vos données » |
+| **Ouvrir dans une page** | bloc « La donnée derrière les chiffres » | tableau des 100 premières lignes filtrées |
+
+Fichier : `google-sheets-dashboard/page.html` ; la logique d'ouverture est dans `js/pages.js`.
+Les données sont **transmises par le dashboard** (`window.LosseClairPages`, même origine) : aucun
+appel réseau supplémentaire vers Google Sheets. Les pages se **rafraîchissent automatiquement**
+quand les filtres changent, et affichent un message explicite si elles sont ouvertes seules
+(nouvel onglet ou rechargement), faute de données.
+
 ## Sans le lanceur
 
 Rien n'est cassé : chaque application reste utilisable comme avant.

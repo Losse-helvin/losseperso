@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Clair · page détachée</title>
+<link rel="icon" href="../assets/logo/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../assets/logo/apple-touch-icon.png">
+<style>
+:root{
+  --bg:#f5f7fb; --panel:#fff; --ink:#192b45; --muted:#788496; --line:#e8edf4;
+  --brand:#5663e8; --soft:#eef0ff; --rose:#c2337a; --teal:#0f7a63; --amber:#9a5b00;
+  --shadow:0 4px 24px rgba(20,36,68,.05);
+}
+body.dark{
+  --bg:#101827; --panel:#1a2639; --ink:#e6edf8; --muted:#a1afc3; --line:#2b3a51;
+  --soft:#2a3160; --rose:#f38fbe; --teal:#6fd8bd; --amber:#f3c069; --shadow:none;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+header{
+  position:sticky;top:0;z-index:5;background:var(--panel);border-bottom:1px solid var(--line);
+  padding:14px 28px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+}
+header img{width:36px;height:36px;object-fit:contain;background:#f5f7fb;border-radius:9px;padding:2px;flex:none}
+header h1{font-size:16px;margin:0;letter-spacing:-.2px}
+header .sub{font-size:11.5px;color:var(--muted);margin:1px 0 0}
+header .spacer{flex:1}
+button{
+  font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+  border-radius:8px;padding:8px 13px;display:inline-flex;align-items:center;gap:7px;font-weight:600;
+  transition:border-color .15s,background .15s;
+}
+button:hover{border-color:var(--brand)}
+button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+main{max-width:1040px;margin:0 auto;padding:24px 28px 60px}
+.meta{
+  display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12px;color:var(--muted);
+  padding:12px 16px;background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-bottom:22px;
+}
+.meta b{color:var(--ink);font-weight:600}
+h2{font-size:19px;margin:30px 0 6px;letter-spacing:-.3px;display:flex;align-items:center;gap:9px}
+h2 .tag{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--soft-ink,var(--brand));
+  background:var(--soft);padding:4px 8px;border-radius:5px;font-weight:700}
+.lead{color:var(--muted);margin:0 0 14px;font-size:13px}
+.advice{
+  background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--brand);
+  border-radius:10px;padding:14px 16px;margin-bottom:11px;box-shadow:var(--shadow);
+}
+.advice strong{display:block;font-size:13.5px;margin-bottom:4px}
+.advice p{margin:0;font-size:13px;color:var(--muted)}
+.insight{
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:12px 15px;margin-bottom:10px;box-shadow:var(--shadow);
+}
+.insight small{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:3px}
+.insight span{font-size:13px}
+.table-wrap{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:auto;box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th{
+  position:sticky;top:0;background:var(--bg);color:var(--muted);font-size:10px;text-transform:uppercase;
+  letter-spacing:.6px;text-align:left;padding:11px 13px;border-bottom:1px solid var(--line);white-space:nowrap;
+}
+td{padding:10px 13px;border-bottom:1px solid var(--line);max-width:260px;overflow-wrap:anywhere}
+tbody tr:hover{background:var(--soft)}
+.empty{
+  background:var(--panel);border:1px dashed var(--line);border-radius:12px;padding:34px;text-align:center;color:var(--muted);
+}
+.empty b{display:block;color:var(--ink);margin-bottom:6px;font-size:15px}
+footer{max-width:1040px;margin:0 auto;padding:0 28px 40px;font-size:11px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between}
+@media print{
+  header,footer,.no-print{display:none!important}
+  body{background:#fff}
+  main{max-width:none;padding:0}
+  .table-wrap{overflow:visible;border:0}
+  table{font-size:10px}
+  th{position:static}
+}
+@media(max-width:640px){
+  header,main,footer{padding-left:16px;padding-right:16px}
+  .meta{font-size:11.5px}
+}
+</style>
+</head>
+<body>
+<header>
+  <img src="../assets/logo/losse-logo-96.png" alt="">
+  <div>
+    <h1 id="pageTitle">Page détachée</h1>
+    <p class="sub" id="pageSub">Clair · Sheets Analytics</p>
+  </div>
+  <div class="spacer"></div>
+  <button id="print" class="no-print" title="Imprimer ou exporter en PDF">Imprimer</button>
+  <button id="close" class="primary no-print">Fermer</button>
+</header>
+
+<main>
+  <div id="meta" class="meta" hidden></div>
+  <div id="body"></div>
+</main>
+
+<footer>
+  <span>Clair · lecture seule · données transmises par le dashboard, aucun appel réseau supplémentaire.</span>
+  <span id="stamp"></span>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  var params = new URLSearchParams(location.search);
+  var kind = params.get('page') === 'records' ? 'records' : 'decisions';
+  var body = document.getElementById('body');
+  var meta = document.getElementById('meta');
+  var stamp = document.getElementById('stamp');
+
+  /* thème : repris du dashboard */
+  try {
+    if (localStorage.getItem('clair-theme') === 'dark') document.body.classList.add('dark');
+  } catch (e) {}
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;      // jamais de HTML injecté
+    return n;
+  }
+
+  function renderMeta(d) {
+    meta.replaceChildren();
+    var items = [
+      ['Fichier', d.sourceTitle || 'Sans titre'],
+      ['Période', d.period.start + ' → ' + d.period.end],
+      ['Portée', d.scope]
+    ];
+    items.forEach(function (pair) {
+      var wrap = el('span');
+      wrap.append(el('b', null, pair[0] + ' : '));
+      wrap.append(document.createTextNode(pair[1]));
+      meta.append(wrap);
+    });
+    meta.hidden = false;
+    if (d.generatedAt) {
+      stamp.textContent = 'Données du ' + new Date(d.generatedAt).toLocaleString('fr-FR');
+    }
+  }
+
+  function adviceList(items) {
+    var frag = document.createDocumentFragment();
+    (items || []).forEach(function (n) {
+      var card = el('article', 'advice');
+      card.append(el('strong', null, n.title));
+      card.append(el('p', null, n.text));
+      frag.append(card);
+    });
+    if (!(items || []).length) frag.append(el('div', 'empty', 'Aucune recommandation pour ces filtres.'));
+    return frag;
+  }
+
+  function renderDecisions(data, title) {
+    document.title = 'Clair · décisions & améliorations';
+    document.getElementById('pageTitle').textContent = 'Décisions & améliorations';
+    document.getElementById('pageSub').textContent = 'Clair · formulaires, sources et lecture des données';
+    renderMeta({
+      sourceTitle: title, period: data.period, scope: data.scope, generatedAt: data.generatedAt
+    });
+
+    var h1 = el('h2', null, 'Formulaires');
+    h1.append(el('span', 'tag', 'à tester'));
+    body.append(h1);
+    body.append(el('p', 'lead', 'Pistes à tester, fondées sur les filtres actifs — aucun gain garanti.'));
+    body.append(adviceList(data.forms));
+
+    var h2 = el('h2', null, 'Sources');
+    h2.append(el('span', 'tag', 'mesure'));
+    body.append(h2);
+    body.append(el('p', 'lead', 'Priorités de mesure et tests d’acquisition — pas un conseil budgétaire automatique.'));
+    body.append(adviceList(data.sources));
+
+    var h3 = el('h2', null, 'Ce que disent vos données');
+    h3.append(el('span', 'tag', 'lecture'));
+    body.append(h3);
+    var frag = document.createDocumentFragment();
+    (data.insights || []).forEach(function (n) {
+      var card = el('div', 'insight');
+      card.append(el('small', null, n.title));
+      card.append(el('span', null, n.text));
+      frag.append(card);
+    });
+    if (data.quality) frag.append(el('div', 'insight', data.quality));
+    body.append(frag);
+  }
+
+  function renderRecords(data, title) {
+    document.title = 'Clair · la donnée derrière les chiffres';
+    document.getElementById('pageTitle').textContent = 'La donnée derrière les chiffres';
+    document.getElementById('pageSub').textContent = 'Clair · aperçu analytique sans coordonnées personnelles';
+    renderMeta({
+      sourceTitle: title, period: data.period, scope: data.scope, generatedAt: data.generatedAt
+    });
+
+    body.append(el('p', 'lead',
+      'Aperçu analytique sans coordonnées personnelles · 100 premières lignes sur ' +
+      data.total.toLocaleString('fr-FR') + ' lignes filtrées.'));
+
+    var heads = ['Jour', 'Formulaire', 'Source', 'Campagne', 'Appareil', 'Code postal', 'Ville', 'Solutions'];
+    var keys = ['day', 'form', 'source', 'campaign', 'device', 'postalCode', 'city', 'solutions'];
+    var wrap = el('div', 'table-wrap');
+    var table = el('table');
+    var thead = el('thead'), trh = el('tr');
+    heads.forEach(function (h) { trh.append(el('th', null, h)); });
+    thead.append(trh);
+    var tbody = el('tbody');
+    (data.rows || []).forEach(function (r) {
+      var tr = el('tr');
+      keys.forEach(function (k) {
+        var v = r[k];
+        if (Array.isArray(v)) v = v.join(' · ');
+        tr.append(el('td', null, v === '' || v == null ? '—' : String(v)));
+      });
+      tbody.append(tr);
+    });
+    table.append(thead, tbody);
+    wrap.append(table);
+    body.append(wrap);
+  }
+
+  /* Les données vivent dans la fenêtre principale (même origine) :
+     on les lit via window.opener, jamais via un appel réseau. */
+  function readStore() {
+    try {
+      if (window.opener && !window.opener.closed) {
+        var s = window.opener.LosseClairPages;
+        if (s) return s;
+      }
+    } catch (e) { /* origine différente : traité comme absence de données */ }
+    return window.LosseClairPages || null;
+  }
+
+  function render() {
+    var store = readStore();
+    body.replaceChildren();
+    if (!store || !store[kind]) {
+      var box = el('div', 'empty');
+      box.append(el('b', null, 'Aucune donnée à afficher'));
+      box.append(document.createTextNode(
+        'Cette page reçoit ses données du dashboard ouvert dans la fenêtre principale. ' +
+        'Revenez-y, lancez « Valider et analyser cet onglet », puis cliquez de nouveau sur le bouton.'));
+      body.append(box);
+      meta.hidden = true;
+      return;
+    }
+    if (kind === 'records') renderRecords(store[kind], store.title);
+    else renderDecisions(store[kind], store.title);
+  }
+
+  /* mise à jour quand les filtres changent dans la fenêtre principale */
+  window.addEventListener('message', function (ev) {
+    if (ev.origin !== location.origin) return;
+    if (ev.data && ev.data.type === 'clair:update') render();
+  });
+
+  document.getElementById('print').onclick = function () { window.print(); };
+  document.getElementById('close').onclick = function () { window.close(); };
+
+  render();
+})();
+</script>
+</body>
+</html>
