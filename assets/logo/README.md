@@ -1,8 +1,12 @@
 # Logo Losse
 
-Logo fourni par le propriétaire du dépôt (image générée, `Gemini_Generated_Image_x5a10px5a10px5a1.jfif`).
-Le damier de transparence de l'image d'origine a été retiré : les fichiers ci-dessous ont un
-**fond réellement transparent** et peuvent être posés sur un thème clair ou sombre.
+Logo fourni par le propriétaire du dépôt : **deux requins-marteaux noir et blanc en formation
+yin-yang** (`Requin yin-yang noir et blanc (1).png`). L'image source possède déjà un vrai canal alpha ;
+elle a été recadrée sur son contenu puis exportée aux tailles ci-dessous, **sans altération de l'œuvre**.
+
+⚠️ Ce logo est **noir et blanc** : le requin noir disparaît sur un fond sombre. Les interfaces
+le posent donc sur une **plaque claire** (`#f4f6fb`) en thème sombre, et directement sur le fond
+en thème clair. Ne pas l'afficher sans support sur un fond foncé.
 
 | Fichier | Taille | Usage |
 |---|---|---|

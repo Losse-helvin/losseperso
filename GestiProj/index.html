@@ -51,7 +51,9 @@ a:hover{text-decoration:underline}
   text-decoration:none;transition:border-color .15s,box-shadow .15s;
 }
 .logo:hover{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);text-decoration:none}
-.logo img{width:32px;height:auto;display:block}
+.logo img{width:30px;height:auto;display:block}
+/* logo noir et blanc : plaque claire garantie, même en thème sombre */
+html[data-theme="dark"] .logo{background:#f4f6fb;border-color:transparent}
 .brand h1{font-size:17px;margin:0;letter-spacing:-.3px}
 .brand p{margin:1px 0 0;font-size:11.5px;color:var(--muted)}
 .topbar .spacer{flex:1}

@@ -19,9 +19,25 @@
 }
 @media print{ .sidebar .app-switch{display:none!important} }
 
-/* Logo Losse dans la barre latérale (ajout) */
+/* Logo Losse dans la barre latérale (ajout) — plaque claire, la barre étant sombre */
 .sidebar .brand-logo{
-  width:46px;height:46px;flex:none;object-fit:contain;
-  background:transparent;border-radius:10px;
+  width:46px;height:46px;flex:none;object-fit:contain;padding:2px;
+  background:#f5f7fb;border-radius:11px;
+  box-shadow:0 2px 8px rgba(0,0,0,.25);
 }
-@media(max-width:800px){ .sidebar .brand-logo{width:38px;height:38px} }
+@media(max-width:800px){ .sidebar .brand-logo{width:40px;height:40px} }
+
+/* ---------- Boutons « Ouvrir dans une page » (pages détachées) ---------- */
+.box-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between}
+.box-head h3{margin:0}
+.page-link{
+  display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;
+  padding:6px 10px;border-radius:7px;cursor:pointer;
+  background:var(--panel);border:1px solid var(--line);color:var(--brand);
+  transition:border-color .15s,background .15s;
+}
+.page-link:hover{border-color:var(--brand);background:var(--soft)}
+.page-link:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.page-link svg{width:13px;height:13px}
+.chart-heading .outline.small svg{width:13px;height:13px;flex:none}
+@media print{ .page-link{display:none!important} }
