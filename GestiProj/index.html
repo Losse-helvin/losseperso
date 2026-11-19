@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GestiProj — Gestion de projets & progression</title>
+<link rel="icon" href="../assets/logo/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../assets/logo/apple-touch-icon.png">
 <!--
   GestiProj — application 100% locale (HTML/CSS/JS, aucune dépendance).
   Ouvrez simplement ce fichier dans un navigateur. Données = localStorage.
@@ -44,9 +46,12 @@ a:hover{text-decoration:underline}
   position:sticky; top:0; z-index:40;
 }
 .logo{
-  width:34px;height:34px;border-radius:9px;background:var(--accent);color:#fff;
-  display:grid;place-items:center;font-weight:700;font-size:17px;flex:none;
+  width:38px;height:38px;border-radius:10px;background:var(--surface2);flex:none;
+  border:1px solid var(--border);display:grid;place-items:center;
+  text-decoration:none;transition:border-color .15s,box-shadow .15s;
 }
+.logo:hover{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);text-decoration:none}
+.logo img{width:32px;height:auto;display:block}
 .brand h1{font-size:17px;margin:0;letter-spacing:-.3px}
 .brand p{margin:1px 0 0;font-size:11.5px;color:var(--muted)}
 .topbar .spacer{flex:1}
@@ -293,7 +298,9 @@ textarea.field{height:auto;padding:9px 11px;resize:vertical;min-height:76px;line
 
 <!-- ============ EN-TÊTE ============ -->
 <header class="topbar">
-  <div class="logo">G</div>
+  <a class="logo" href="../index.html" title="Retour au hub Losse">
+    <img src="../assets/logo/losse-logo-96.png" alt="Losse" width="96" height="91">
+  </a>
   <div class="brand">
     <h1>GestiProj</h1>
     <p>Gestion de tâches & suivi de progression</p>
