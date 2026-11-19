@@ -62,6 +62,19 @@ volumineux qui allongeaient beaucoup le dashboard :
 - L'état `aria-expanded` est tenu à jour et le focus revient au bouton à la fermeture.
 - À l'impression, les contenus masqués sont **réintégrés** pour que le rapport reste complet.
 
+## Design et accessibilité
+
+- **Logo volontairement contrasté par le fond** : sur fond clair seul le requin noir se détache,
+  sur fond sombre seul le requin blanc reste visible. Le second requin est invisible, et c'est
+  l'effet recherché (protection de l'identité du logo) — voir `assets/logo/README.md`.
+  Servi en **WebP** (poids /3) avec repli PNG sur le hub.
+- Focus clavier toujours visible, cibles tactiles de 40 px minimum, `aria-*` renseignés sur les
+  boutons de révélation, information jamais portée par la seule couleur.
+- Respect de `prefers-reduced-motion` : animations et défilement doux désactivés si l'utilisateur
+  l'a demandé.
+- Dimensions intrinsèques déclarées sur les images (pas de décalage de mise en page au chargement).
+- Feuille d'impression dédiée : seuls les contenus utiles sont imprimés.
+
 ## Sans le lanceur
 
 Rien n'est cassé : chaque application reste utilisable comme avant.
