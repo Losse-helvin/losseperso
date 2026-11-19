@@ -64,9 +64,10 @@ volumineux qui allongeaient beaucoup le dashboard :
 
 ## Design et accessibilité
 
-- **Logo en deux variantes** : la version standard sur fond clair, une version au requin noir
-  éclairci sur fond sombre, choisie automatiquement selon le thème. Servi en **WebP** (poids /3)
-  avec repli PNG.
+- **Logo volontairement contrasté par le fond** : sur fond clair seul le requin noir se détache,
+  sur fond sombre seul le requin blanc reste visible. Le second requin est invisible, et c'est
+  l'effet recherché (protection de l'identité du logo) — voir `assets/logo/README.md`.
+  Servi en **WebP** (poids /3) avec repli PNG sur le hub.
 - Focus clavier toujours visible, cibles tactiles de 40 px minimum, `aria-*` renseignés sur les
   boutons de révélation, information jamais portée par la seule couleur.
 - Respect de `prefers-reduced-motion` : animations et défilement doux désactivés si l'utilisateur

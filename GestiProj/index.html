@@ -52,8 +52,8 @@ a:hover{text-decoration:underline}
 }
 .logo:hover{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);text-decoration:none}
 .logo img{width:30px;height:auto;display:block}
-/* le logo a une variante claire pour le fond sombre (voir applyLogo) */
-html[data-theme="dark"] .logo{background:var(--surface2);border-color:var(--border)}
+/* pas de plaque derrière le logo : le fond reste celui de l'interface */
+html[data-theme="dark"] .logo{background:transparent;border-color:transparent}
 .brand h1{font-size:17px;margin:0;letter-spacing:-.3px}
 .brand p{margin:1px 0 0;font-size:11.5px;color:var(--muted)}
 .topbar .spacer{flex:1}
@@ -1184,15 +1184,10 @@ function saveSyncFields(){
   save();
 }
 function applyTheme(){
-  const dark = (state.prefs.theme||'light') === 'dark';
-  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-  $('#themeBtn').textContent = dark ? '☀️' : '🌙';
-  // deux variantes du logo : la claire pour le fond sombre
-  const img = $('#appLogo');
-  if(img){
-    const src = '../assets/logo/losse-logo' + (dark ? '-light' : '') + '-96.png';
-    if(img.getAttribute('data-src') !== src){ img.setAttribute('data-src', src); img.src = src; }
-  }
+  // Un seul logo, jamais retouché : sur fond sombre seul le requin blanc ressort
+  // (effet voulu, voir assets/logo/README.md).
+  document.documentElement.setAttribute('data-theme', (state.prefs.theme||'light')==='dark' ? 'dark' : 'light');
+  $('#themeBtn').textContent = state.prefs.theme==='dark' ? '☀️' : '🌙';
 }
 
 /* ---------------------------- Démarrage ---------------------------- */

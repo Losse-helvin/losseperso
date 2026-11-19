@@ -87,13 +87,10 @@ html[data-theme="dark"] .pill.warn{color:#fbbf24;border-color:#5a4520}
   filter:drop-shadow(0 18px 34px rgba(17,28,51,.18))}
 /* le logo existe en deux variantes : la version claire (noir éclairci) est
    utilisée en thème sombre pour que les deux requins restent lisibles */
-html[data-theme="dark"] .hero-logo img{filter:drop-shadow(0 18px 34px rgba(0,0,0,.55))}
-html[data-theme="dark"] .logo-halo{background:radial-gradient(closest-side, rgba(139,149,255,.18), transparent 78%)}
-.logo-halo{
-  position:absolute;inset:-18%;border-radius:50%;z-index:0;
-  background:radial-gradient(closest-side, color-mix(in srgb,var(--brand) 20%,transparent), transparent 78%);
-  filter:blur(6px);
-}
+/* Aucun halo ni plaque derrière le logo : le fond doit rester tel quel pour que
+   seul le requin contrastant soit visible (effet voulu, voir assets/logo/README.md). */
+html[data-theme="dark"] .hero-logo img{filter:drop-shadow(0 18px 30px rgba(0,0,0,.5))}
+
 .eyebrow{
   display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;
   letter-spacing:.16em;text-transform:uppercase;color:var(--brand);
@@ -330,7 +327,8 @@ p{max-width:70ch}
       </p>
     </div>
     <div class="hero-logo">
-      <div class="logo-halo" aria-hidden="true"></div>
+      <!-- Effet voulu : le logo n'est pas retouché. Sur fond clair seul le requin noir
+           se détache ; sur fond sombre seul le requin blanc reste visible. -->
       <img id="heroLogo" src="assets/logo/losse-logo-256.png" width="256" height="216"
            alt="Logo Losse : deux requins-marteaux en formation circulaire"
            fetchpriority="high" decoding="async">
@@ -459,41 +457,11 @@ p{max-width:70ch}
   try { stored = localStorage.getItem('hub-theme'); } catch (e) {}
   var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   var theme = stored || (prefersDark ? 'dark' : 'light');
-  /* Deux variantes du logo : la claire (noir éclairci) pour le fond sombre,
-     sinon les requins noirs disparaîtraient. Fichiers servis en WebP quand c'est possible. */
-  var LOGOS = {
-    light: { hero: 'assets/logo/losse-logo-256.png', mark: 'assets/logo/losse-logo-96.png' },
-    dark:  { hero: 'assets/logo/losse-logo-light-256.png', mark: 'assets/logo/losse-logo-light-96.png' }
-  };
-  var webp = (function(){
-    try {
-      var c = document.createElement('canvas');
-      return c.toDataURL('image/webp').indexOf('data:image/webp') === 0;
-    } catch (e) { return false; }
-  })();
-  function logoUrl(path){
-    return webp ? path.replace(/\.png$/, '.webp') : path;
-  }
-  function applyLogo(){
-    var set = LOGOS[theme === 'dark' ? 'dark' : 'light'];
-    var hero = document.getElementById('heroLogo');
-    var mark = document.getElementById('markLogo');
-    if (hero && hero.getAttribute('data-src') !== set.hero) {
-      hero.setAttribute('data-src', set.hero);
-      hero.src = logoUrl(set.hero);
-    }
-    if (mark && mark.getAttribute('data-src') !== set.mark) {
-      mark.setAttribute('data-src', set.mark);
-      mark.src = logoUrl(set.mark);
-    }
-  }
-
   function applyTheme(){
     root.setAttribute('data-theme', theme);
     var btn = document.getElementById('theme');
     btn.textContent = theme === 'dark' ? '☀️' : '🌙';
     btn.setAttribute('aria-label', theme === 'dark' ? 'Passer au thème clair' : 'Passer au thème sombre');
-    applyLogo();
   }
   function toggleTheme(){
     theme = theme === 'dark' ? 'light' : 'dark';

@@ -19,10 +19,12 @@
 }
 @media print{ .sidebar .app-switch{display:none!important} }
 
-/* Logo Losse dans la barre latérale — variante claire, pas de plaque opaque */
+/* Logo Losse : aucune plaque ni recoloration. La barre latérale étant toujours sombre,
+   seul le requin blanc s'y détache — c'est l'effet voulu (voir assets/logo/README.md).
+   L'ombre très légère ne sert qu'à détacher le contour clair du requin noir. */
 .sidebar .brand-logo{
   width:46px;height:46px;flex:none;object-fit:contain;
-  filter:drop-shadow(0 2px 6px rgba(0,0,0,.35));
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.45));
 }
 @media(max-width:800px){ .sidebar .brand-logo{width:40px;height:40px} }
 

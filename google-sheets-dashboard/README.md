@@ -91,8 +91,9 @@ masquées sont réintégrées afin de ne rien perdre du rapport.
 - Si le référentiel est indisponible, l'analyse continue : les villes simplement ne sont pas
   déduites du code postal, avec un message explicite (aucune ville inventée).
 - Les tests injectent le référentiel via `setPostalReference()` au lieu de l'importer.
-- Logo servi en **WebP** quand le navigateur l'accepte, avec repli PNG, et variante claire
-  automatique pour le thème sombre.
+- Logo servi en **WebP** quand le navigateur l'accepte, avec repli PNG. La barre latérale étant
+  toujours sombre, seul le requin blanc du logo y est visible — effet volontaire, ne pas ajouter
+  de plaque claire ni de variante recolorée.
 
 ## Fonctionnalités
 
