@@ -108,7 +108,10 @@ masquées sont réintégrées afin de ne rien perdre du rapport.
 - Projections MM7 à 7/30 jours ; scénario linéaire seulement après 14 jours complets ; blocage des projections d'un formulaire sélectionné avant 28 jours complets et 30 leads.
 - Synchronisation 1/5/15 min ; prévention des appels qui se chevauchent, cache mémoire 30 s pour la lecture d'aperçu, retry limité sur quotas/erreurs transitoires.
 - Export CSV **analytique sans coordonnées ni ID lead**, PNG par graphique, PDF multipage et impression.
-- Mode clair/sombre (seul le thème est conservé en localStorage), responsive.
+- Mode clair/sombre par `data-theme` sur `<html>`, appliqué avant le premier rendu : choix mémorisé
+  dans `localStorage['losse-theme']`, partagé avec le hub et GestiProj, suivi du système par défaut.
+  Le réglage est accessible dans la barre latérale et, sur mobile, dans la barre supérieure.
+- Responsive (barre latérale repliée sous 800 px).
 - Démonstration locale fictive, sans appel à Google Sheets.
 
 ## Définition des métriques et limites statistiques

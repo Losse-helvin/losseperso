@@ -6,6 +6,8 @@
 <title>GestiProj — Gestion de projets & progression</title>
 <link rel="icon" href="../assets/logo/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="../assets/logo/apple-touch-icon.png">
+<!-- Thème appliqué avant le premier rendu (mémorisé, partagé avec le hub et Clair). -->
+<script src="../assets/theme.js"></script>
 <!--
   GestiProj — application 100% locale (HTML/CSS/JS, aucune dépendance).
   Ouvrez simplement ce fichier dans un navigateur. Données = localStorage.
@@ -20,6 +22,10 @@
   --red:#d93025; --red-soft:#fce8e6; --amber:#e37400; --amber-soft:#fef7e0;
   --blue:#1a73e8; --blue-soft:#e8f0fe; --grey-soft:#f1f3f4;
   --radius:10px;
+  /* couleurs d'interface (aucune ne concerne le logo) */
+  --on-accent:#ffffff;            /* texte posé sur un aplat accentué */
+  --toast-bg:#202724; --toast-text:#ffffff;
+  --overlay:rgba(15,23,20,.45);
 }
 html[data-theme="dark"]{
   --bg:#141816; --surface:#1c211f; --surface2:#222825; --border:#333c37;
@@ -99,8 +105,8 @@ html[data-theme="dark"] .app-switch-ico{background:#2a2340;color:#c3aef7}
   white-space:nowrap;transition:.15s;
 }
 .btn:hover{border-color:var(--accent);color:var(--accent2)}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:var(--shadow)}
-.btn.primary:hover{background:var(--accent2);color:#fff}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);box-shadow:var(--shadow)}
+.btn.primary:hover{background:var(--accent2);color:var(--on-accent)}
 .btn.danger{color:var(--red)}
 .btn.danger:hover{border-color:var(--red)}
 .btn.sm{padding:5px 9px;font-size:11.5px;font-weight:500}
@@ -220,7 +226,7 @@ select.cell-input{cursor:pointer}
 
 /* ---------- Modales & tiroir ---------- */
 .overlay{
-  position:fixed;inset:0;background:rgba(15,23,20,.45);z-index:60;
+  position:fixed;inset:0;background:var(--overlay);z-index:60;
   display:none;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(2px);
 }
 .overlay.open{display:flex}
@@ -278,10 +284,10 @@ textarea.field{height:auto;padding:9px 11px;resize:vertical;min-height:76px;line
 /* Toast */
 .toast-wrap{position:fixed;bottom:20px;left:20px;z-index:90;display:flex;flex-direction:column;gap:8px}
 .toast{
-  background:#202724;color:#fff;padding:11px 16px;border-radius:9px;font-size:12.5px;
+  background:var(--toast-bg);color:var(--toast-text);padding:11px 16px;border-radius:9px;font-size:12.5px;
   box-shadow:0 8px 24px rgba(0,0,0,.25);animation:pop .25s ease;max-width:340px;
 }
-.toast.ok{background:#137333}.toast.err{background:#c5221f}
+.toast.ok{background:#137333;color:#fff}.toast.err{background:#c5221f;color:#fff}
 @keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 .badge-count{background:var(--accent-soft);color:var(--accent2);border-radius:99px;padding:1px 7px;font-size:10.5px;font-weight:700;margin-left:6px}
@@ -294,6 +300,19 @@ textarea.field{height:auto;padding:9px 11px;resize:vertical;min-height:76px;line
   .wrap{padding:14px 12px 50px}.topbar{padding:10px 12px}
   .form-grid{grid-template-columns:1fr}.search{max-width:none}
 }
+
+/* à l'impression : le thème sombre est ignoré, le papier reste blanc */
+@media print{
+  html[data-theme]{--bg:#fff;--surface:#fff;--surface2:#fff;--text:#111827;--muted:#4b5563;--border:#d1d5db}
+  .topbar,.toolbar,.icon-btn,.app-switch,.toast{display:none!important}
+}
+/* respect de la préférence système : pas d'animation */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;
+    transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+/* sélection de texte aux couleurs de l'application */
+::selection{background:color-mix(in srgb,var(--accent) 26%,transparent)}
 </style>
 </head>
 <body>
@@ -316,7 +335,8 @@ textarea.field{height:auto;padding:9px 11px;resize:vertical;min-height:76px;line
     <span class="app-switch-ico" aria-hidden="true">c.</span>
     <span class="app-switch-txt">Clair · Analytics<small>ouvrir dans une fenêtre</small></span>
   </a>
-  <button class="icon-btn" id="themeBtn" title="Changer de thème">🌙</button>
+  <button class="icon-btn" id="themeBtn" type="button" data-theme-toggle
+          title="Changer de thème" aria-label="Changer de thème"><span data-theme-icon aria-hidden="true">🌙</span></button>
 </header>
 
 <main class="wrap">
@@ -588,7 +608,7 @@ function defaultData(){
         description:'Suivi des indicateurs de vente.',
         etapes:[{id:uid(),titre:'Collecte des KPI',fait:true},{id:uid(),titre:'Maquette du dashboard',fait:true},{id:uid(),titre:'Développement',fait:true},{id:uid(),titre:'Recette',fait:true}]})
     ],
-    prefs:{ theme:'light', view:'table', search:'', priority:'', status:'', sort:{k:'nom',dir:1},
+    prefs:{ view:'table', search:'', priority:'', status:'', sort:{k:'nom',dir:1},
             sync:{ url:'', token:'' } }
   };
 }
@@ -1023,11 +1043,7 @@ async function syncPush(){
 
 /* ---------------------------- Événements ---------------------------- */
 function bind(){
-  // Thème
-  $('#themeBtn').addEventListener('click', ()=>{
-    state.prefs.theme = state.prefs.theme==='dark'?'light':'dark';
-    applyTheme(); save();
-  });
+  // Thème : géré par assets/theme.js (choix mémorisé, partagé avec le hub et Clair).
   // Recherche & filtres
   $('#search').addEventListener('input', e=>{ state.prefs.search=e.target.value; save(); renderTable(); renderGantt(); });
   $('#filterPriority').addEventListener('change', e=>{ state.prefs.priority=e.target.value; save(); renderTable(); renderGantt(); });
@@ -1184,10 +1200,18 @@ function saveSyncFields(){
   save();
 }
 function applyTheme(){
+  // Le thème est appliqué par assets/theme.js. Ici on ne corrige qu'un cas :
+  // l'ancienne préférence enregistrée dans les données de GestiProj est reportée
+  // une seule fois dans le réglage partagé, pour ne pas perdre le choix existant.
+  try{
+    const legacy = state.prefs && state.prefs.theme;
+    if((legacy==='dark'||legacy==='light') && !localStorage.getItem('losse-theme')){
+      window.LosseTheme && window.LosseTheme.set(legacy);
+    }
+    if(state.prefs) delete state.prefs.theme;
+  }catch(e){}
   // Un seul logo, jamais retouché : sur fond sombre seul le requin blanc ressort
   // (effet voulu, voir assets/logo/README.md).
-  document.documentElement.setAttribute('data-theme', (state.prefs.theme||'light')==='dark' ? 'dark' : 'light');
-  $('#themeBtn').textContent = state.prefs.theme==='dark' ? '☀️' : '🌙';
 }
 
 /* ---------------------------- Démarrage ---------------------------- */
